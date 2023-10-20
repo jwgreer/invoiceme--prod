@@ -17,11 +17,6 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-if os.environ.get('ENVIRONMENT') == 'production':
-    SITE_URL = 'http://www.invoiceme.site'
-else:
-    SITE_URL = 'http://localhost:8000'
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -30,10 +25,10 @@ else:
 SECRET_KEY = 'django-insecure-1&98=t98g6eq-k3br0qy4gi^4d89y5_h9%v622-)k(+3j4jzww'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 if DEBUG:
-    SITE_URL = 'http://localhost:8000'
+    SITE_URL = 'http://127.0.0.1:8000'
 else:
     SITE_URL = 'http://www.invoiceme.site'
 

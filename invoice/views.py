@@ -53,16 +53,77 @@ def itemInvoiceAPI(request, invoice_pk):
         try:
             items = InvoiceItem.objects.filter(invoice=invoice_pk)
             serializer = invoiceItemSerializer(items, many=True)
-            return JsonResponse(serializer.data, safe=False)
+            return Response(serializer.data)
         except InvoiceItem.DoesNotExist:
-            return JsonResponse([], safe=False)  # Return an empty list if no items are found for the given invoice
+            return Response([], status=status.HTTP_200_OK)  # Return an empty list if no items are found for the given invoice
     if request.method == "POST":
         serializer = invoiceItemSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    # Handle other HTTP methods
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     return
+
+@api_view(['GET'])
+def productsIDAPI(request, id):
+    if request.method == "GET":
+        product= Product.objects.get(pk=id)
+        serializer = productSerializer(product)
+        return JsonResponse(serializer.data, safe=False)
+    return
+
+@api_view(['GET'])
+def newestProductAPI(request, invoice_pk):
+    if request.method == "GET":
+        try:
+            # Get the specific invoice
+            invoice = Invoice.objects.get(invoice_num=invoice_pk)
+
+            # Get the most recent item for the given invoice
+            item = InvoiceItem.objects.filter(invoice=invoice).order_by('-created_at')[:1]
+
+            serializer = invoiceItemSerializer(item, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        except Invoice.DoesNotExist:
+            # Handle the case where the specified invoice does not exist
+            return JsonResponse({'error': 'Invoice not found'}, status=404)
+        
+@api_view(['PUT'])
+def editInvoiceItemAPI(request, invoice_pk, id):
+    try:
+        # Try to get the InvoiceItem with the specified ID
+        invoice_item = InvoiceItem.objects.get(pk=id)
+    except InvoiceItem.DoesNotExist:
+        # If the InvoiceItem does not exist, return a 404 Not Found response
+        return Response({'detail': 'InvoiceItem not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'PUT':
+        # Assuming you have a serializer for your InvoiceItem model
+        serializer = invoiceItemSerializer(invoice_item, data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({'detail': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+@api_view(['DELETE'])
+def deleteInvoiceItemAPI(request, id):
+    try:
+        # Try to get the InvoiceItem with the specified ID
+        invoice_item = InvoiceItem.objects.get(pk=id)
+    except InvoiceItem.DoesNotExist:
+        # If the InvoiceItem does not exist, return a 404 Not Found response
+        return Response({'detail': 'InvoiceItem not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "DELETE":
+        # If the request method is DELETE, delete the InvoiceItem
+        invoice_item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 def createInvoice(request):
     clients = Client.objects.all()

@@ -15,9 +15,12 @@ urlpatterns = [
 
 
     path('invoice/api/createInvoice/', views.createInvoiceAPI, name='createInvoiceAPI'),
-    path('api/invoiceAll/', views.invoiceAllAPI, name="invoiceAllAPI"),
-    path('itemInvoice/<int:invoice_pk>/', views.itemInvoiceAPI, name="itemInvoiceAPI"),
-
-    path('api/clientAll/', views.clientsAllAPI, name="clientAllAPI"),
+    path('invoice/api/invoiceAll/', views.invoiceAllAPI, name="invoiceAllAPI"),
+    path('invoice/api/itemInvoice/<int:invoice_pk>/', views.itemInvoiceAPI, name="itemInvoiceAPI"),
+    path('invoice/api/productsID/<int:id>/', views.productsIDAPI, name="productsIDAPI"),
+    path('invoice/api/clientAll/', views.clientsAllAPI, name="clientAllAPI"),
+    path('invoice/api/newestProduct/<int:invoice_pk>/', views.newestProductAPI, name="newestProductAPI"),
+    path('invoice/api/editInvoiceItem/<int:invoice_pk>/<int:id>/', views.editInvoiceItemAPI, name="editInvoiceItemAPI"),
+    path('invoice/api/deleteInvoiceItem/<int:id>/', views.deleteInvoiceItemAPI, name="deleteInvoiceItemAPI"),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
