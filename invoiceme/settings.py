@@ -30,7 +30,7 @@ else:
 SECRET_KEY = 'django-insecure-1&98=t98g6eq-k3br0qy4gi^4d89y5_h9%v622-)k(+3j4jzww'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 if DEBUG:
     SITE_URL = 'http://localhost:8000'
