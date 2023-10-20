@@ -3,6 +3,7 @@ from .models import *
 from .filters import *
 from .forms import *
 from .serializers import *
+from .urls import *
 import requests
 import json
 from django.http import HttpResponse, JsonResponse
@@ -69,7 +70,7 @@ def createInvoice(request):
             }
 
             # Define the API endpoint URL where you want to send the POST request
-            api_url = f'{settings.SITE_URL}/invoice/api/createInvoice/'
+            api_url = f'{invoiceAllAPI}'
             print("test")
             print(api_payload)
 
