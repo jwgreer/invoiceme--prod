@@ -56,7 +56,6 @@ def createInvoice(request):
         form = InvoiceForm(request.POST)
         if form.is_valid():
             client_id = form.cleaned_data['client'].id 
-            print(client_id)
             invoice_date = form.cleaned_data['invoice_date']
 
             invoice_date_str = invoice_date.strftime('%Y-%m-%d')
@@ -72,6 +71,7 @@ def createInvoice(request):
 
             # Define the API endpoint URL where you want to send the POST request
             api_url = f'{settings.SITE_URL}/invoice/api/createInvoice/'
+            print(api_url)
             print("test")
             print(api_payload)
 
