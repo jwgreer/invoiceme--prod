@@ -160,6 +160,7 @@ def createInvoice(request):
                     response_data = json.loads(response.text)
                     invoice_id = response_data.get('invoice_num')
                     print(response_data)
+                    print(invoice_id)
                     # Invoice created successfully
                     return redirect('invoice:addItems', invoice_id)
                 else:
