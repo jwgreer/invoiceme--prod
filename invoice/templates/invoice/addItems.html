@@ -23,7 +23,11 @@
         <div style="height: 400px;">
         
             <div>
-
+                <form method="get">
+                    {{myFilter.form.as_table}}
+                    <button class="btn btn-primary">Search</button>
+                    <a class="btn btn-warning" href="#">Reset</a>
+                </form>
             </div>
 
             <div>
@@ -36,20 +40,62 @@
                         <th>Quantity</th>
                         <th>Add Item</th>
                     </tr>
+                    {% for i in products %}
+                        <form method="post" action="#">
+                            <tr>
+                                <td>{{ i.name }}</td>
+                                <td>{{ i.description }}</td>
+                                <td>{{ i.price }}</td>
+                                <td>{{ i.product_type }}</td>
+                                <td><input type="number" name="quantity" placeholder="quantity" min="1"/></td>
+                                <td><button type="submit">Add Item</button></td>
+                            </tr>
+                        </form>
+                    {% endfor %}
                 </table>
             </div>
+        </div>
+        <div class="pagination text-center">
+            <span class="step-links">
+                {% if products.has_next %}
+                    <a href="?page={{ products.paginator.num_pages }}">last</a>
+                    <a href="?page={{ products.next_page_number }}">next</a>
+                {% endif %}
             
+                <span class="current-page">
+                    Page {{ products.number }} of {{ products.paginator.num_pages }}.
+                </span>
+            
+                {% if products.has_previous %}
+                    <a href="?page={{ products.previous_page_number }}">previous</a>
+                    <a href="?page=1">first</a>
+                {% endif %}
+            </span>
         </div>
     </div>
 </div>
 
 <div class="row">
+    <form id="invoiceForm">
+        <label for="product">Product:</label>
+        <select id="product" name="product" required>
+            <option value="">Select a product</option>
+            {% for product in products %}
+                <option value="{{ product.id }}">{{ product.name }}</option>
+            {% endfor %}
+        </select><br><br>
 
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" required min="1"><br><br>
+
+        <button type="submit">Add Item</button>
+    </form>
     <div class="col-md-5">
         <div class="d-grid gap-2 col-6 mx-auto">
-
+    <a href="#" target="_blank" class="btn btn-primary">Preview PDF</a>
         </div>
     </div>
 </div>
+
 
 {% endblock content %}

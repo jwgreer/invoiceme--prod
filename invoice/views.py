@@ -150,9 +150,13 @@ def addItems(request, invoice_id):
 
     return render(request, 'invoice/addItems.html', context)
 
-def invoiceHistory(request):
 
-    context = {}
+def invoiceHistory(request):
+    all_invoices = Invoice.objects.order_by('-created_at')  # Ordering by created_at in descending order
+    paginator = Paginator(all_invoices, 10)  # Display 10 invoices per page (you can adjust the number)
+    page = request.GET.get('page')
+    invoices = paginator.get_page(page)
+    context = {'invoices': invoices}
 
     return render(request, 'invoice/invoiceHistory.html', context)
 

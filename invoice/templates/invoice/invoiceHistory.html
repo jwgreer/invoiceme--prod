@@ -1,7 +1,7 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<h1>Invoice History</h1>
+<h1>Past Invoices</h1>
 <table>
     <thead>
       <tr>
@@ -13,6 +13,40 @@
          
       </tr>
     </thead>
+    <tbody>
+      {% for invoice in invoices %}
+        <tr>
+          <td>{{ invoice.invoice_num }}</td>
+          <td>{{ invoice.client }}</td>
+          <td>{{ invoice.invoice_date }}</td>
+          <td>{{ invoice.status }}</td>
+          <td>
+            <!-- Add a link or button to open the editInvoice view with a confirmation pop-up -->
+            <a href="{% url 'invoice:addItems' invoice.invoice_num %}" onclick="return confirm('Are you sure you want to edit?')">Edit</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4">No invoices available.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
   </table>
-
+  <div class="pagination">
+    <span class="step-links">
+      {% if invoices.has_next %}
+        <a href="?page={{ invoices.paginator.num_pages }}">last</a>
+        <a href="?page={{ invoices.next_page_number }}">next</a>
+      {% endif %}
+    
+      <span class="current-page">
+        Page {{ invoices.number }} of {{ invoices.paginator.num_pages }}.
+      </span>
+    
+      {% if invoices.has_previous %}
+        <a href="?page={{ invoices.previous_page_number }}">previous</a>
+        <a href="?page=1">first</a>
+      {% endif %}
+    </span>
+  </div>
 {% endblock %}
