@@ -47,6 +47,22 @@ def clientsAllAPI(request):
         serializer = clientSerializer(client,many=True)
         return JsonResponse(serializer.data, safe=False)
 
+@api_view(['GET','POST'])  
+def itemInvoiceAPI(request, invoice_pk):
+    if request.method == "GET":
+        try:
+            items = InvoiceItem.objects.filter(invoice=invoice_pk)
+            serializer = invoiceItemSerializer(items, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        except InvoiceItem.DoesNotExist:
+            return JsonResponse([], safe=False)  # Return an empty list if no items are found for the given invoice
+    if request.method == "POST":
+        serializer = invoiceItemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    return
 
 def createInvoice(request):
     clients = Client.objects.all()
@@ -111,6 +127,7 @@ def addItems(request, invoice_id):
     client = invoice.client
     products = Product.objects.all()
     productType = ProductType.objects.all()
+    site_url = settings.SITE_URL
 
     myFilter = ProductsFilter(request.GET, queryset=products)
     products = myFilter.qs
@@ -146,6 +163,7 @@ def addItems(request, invoice_id):
         'formset': formset,
         'products': products,
         'myFilter': myFilter,
+        'site_url': site_url,
     }
 
     return render(request, 'invoice/addItems.html', context)

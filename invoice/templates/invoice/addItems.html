@@ -1,8 +1,9 @@
 {% extends "base/base.html" %}
+{% load static %}
 
 
 {% block content %}
-
+<div id="hiddenDataDiv" data-custom-data="{{ invoice }}"></div>
 
 <h1>Add Items to Invoice</h1>
 
@@ -97,5 +98,8 @@
     </div>
 </div>
 
+<script>let invoiceValue = '{{ invoice }}';</script>
+<script>let site_url = '{{ site_url }}';</script>
+<script src="{% static 'js/addItems.js' %}"></script>
 
 {% endblock content %}
