@@ -71,7 +71,7 @@ def createInvoice(request):
             }
 
             # Define the API endpoint URL where you want to send the POST request
-            api_url = f'{invoiceAllAPI}'
+            api_url = 'https://www.invoiceme.site/invoice/api/createInvoice/'
             print("test")
             print(api_payload)
 
