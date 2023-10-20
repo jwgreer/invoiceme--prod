@@ -1,0 +1,55 @@
+{% extends "base/base.html" %}
+
+
+{% block content %}
+
+
+<h1>Add Items to Invoice</h1>
+
+<div class="row">
+    <div class="col-md-5">
+        <table id="item-table">
+            <tr>
+                <th>Product Name</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="col-md-7">
+        <div style="height: 400px;">
+        
+            <div>
+
+            </div>
+
+            <div>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Product Type</th>
+                        <th>Quantity</th>
+                        <th>Add Item</th>
+                    </tr>
+                </table>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="col-md-5">
+        <div class="d-grid gap-2 col-6 mx-auto">
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
