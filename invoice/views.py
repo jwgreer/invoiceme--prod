@@ -12,6 +12,8 @@ from rest_framework import status
 from django.urls import reverse
 from django.conf import settings
 from django.core.paginator import Paginator, Page
+from django.conf import settings
+
 
 
 def index(request):
