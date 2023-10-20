@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 if os.environ.get('ENVIRONMENT') == 'production':
-    SITE_URL = 'http://invoiceme.site'
+    SITE_URL = 'http://www.invoiceme.site'
 else:
     SITE_URL = 'http://localhost:8000'
 
@@ -30,7 +30,7 @@ else:
 SECRET_KEY = 'django-insecure-1&98=t98g6eq-k3br0qy4gi^4d89y5_h9%v622-)k(+3j4jzww'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
