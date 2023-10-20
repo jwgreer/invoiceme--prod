@@ -71,7 +71,7 @@ def createInvoice(request):
             }
 
             # Define the API endpoint URL where you want to send the POST request
-            api_url = reverse('invoiceAllAPI')
+            api_url = f'{invoiceAllAPI}'
             print("test")
             print(api_payload)
 
