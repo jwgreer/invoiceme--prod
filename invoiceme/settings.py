@@ -37,7 +37,7 @@ if DEBUG:
 else:
     SITE_URL = 'http://www.invoiceme.site'
 
-ALLOWED_HOSTS = ['invoiceme.site', 'jordan.invoiceme.site', 'localhost:8000']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
