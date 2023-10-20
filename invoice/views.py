@@ -14,6 +14,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.core.paginator import Paginator, Page
 from django.conf import settings
+from django.urls import reverse
 
 
 
@@ -70,7 +71,7 @@ def createInvoice(request):
             }
 
             # Define the API endpoint URL where you want to send the POST request
-            api_url = f'{invoiceAllAPI}'
+            api_url = reverse('invoiceAllAPI')
             print("test")
             print(api_payload)
 
