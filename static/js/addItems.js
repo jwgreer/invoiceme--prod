@@ -10,7 +10,7 @@ function getCSRFToken() {
 }
 
 function postInvoiceData(invoice, product, quantity) {
-    const apiUrl =`${site_url}/invoice/api/itemInvoice/${invoiceValue}/`;
+    const apiUrl = site_url+ '/invoice/api/itemInvoice/' + invoiceValue + '/';
     console.log(apiUrl)
     console.log(quantity)
     console.log(product)
@@ -38,7 +38,7 @@ function postInvoiceData(invoice, product, quantity) {
 }
 
 function callProductApi(productId) {
-    const apiUrl = `${site_url}/invoice/api/productsID/${productId}/`;
+    const apiUrl = site_url +'/invoice/api/productsID/' + productId + '/';
 
     return fetch(apiUrl, {
         method: 'GET',
@@ -64,7 +64,7 @@ function getInvoiceData() {// Replace with the actual Django template variable
         table.deleteRow(1);
     }
 
-    const apiUrl = `${site_url}/invoice/api/itemInvoice/${invoiceValue}/`;
+    const apiUrl = site_url +'/invoice/api/itemInvoice/' + invoiceValue + '/';
 
     console.log(apiUrl)
 
@@ -106,7 +106,7 @@ function getInvoiceData() {// Replace with the actual Django template variable
                 id = item.id
                 const invoice_pk = invoiceValue
                 const editLink = document.createElement('a');
-                editLink.href = `${site_url}/invoice/api/editInvoiceItem/${invoice_pk}/${id}/`;
+                editLink.href = site_url+'/invoice/api/editInvoiceItem/' + invoice_pk + '/' +id + '/';
                 editLink.onclick = function() {
                     return confirm('Are you sure you want to edit?');
                 };
@@ -128,7 +128,7 @@ function getInvoiceData() {// Replace with the actual Django template variable
 
 function getNewestItem(invoiceValue) {
     console.log(invoiceValue)
-    const apiUrl = `${site_url}/invoice/api/newestProduct/${invoiceValue}/`; // Declare these variables at a higher scope
+    const apiUrl = site_url + '/invoice/api/newestProduct/' +invoiceValue +'/'; // Declare these variables at a higher scope
     let quantity;
     let id;
 
@@ -200,7 +200,7 @@ function getNewestItemAndAddToTable() {
         // Create edit and delete links as before
         const invoice_pk = invoiceValue
         const editLink = document.createElement('a');
-        editLink.href = `${site_url}/invoice/api/editInvoiceItem/${invoice_pk}/${newestItem.id}/`;
+        editLink.href = site_url+'/invoice/api/editInvoiceItem/'+invoice_pk+'/'+newestItem.id+'/';
         editLink.onclick = function() {
             return confirm('Are you sure you want to edit?');
         };
@@ -222,7 +222,7 @@ function getNewestItemAndAddToTable() {
 
 
 function deleteInvoiceItem(id) {
-    const apiUrl = `${site_url}/invoice/api/deleteInvoiceItem/${id}/`;
+    const apiUrl = site_url+'/invoice/api/deleteInvoiceItem/' +id + '/';
 
     return fetch(apiUrl, {
         method: 'DELETE',
