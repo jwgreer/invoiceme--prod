@@ -37,7 +37,7 @@ if DEBUG:
 else:
     SITE_URL = 'http://www.invoiceme.site'
 
-ALLOWED_HOSTS = ['invoiceme-df1f959499bb.herokuapp','localhost:8000','invoiceme.site','invoiceme']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
