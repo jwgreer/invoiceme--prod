@@ -9,23 +9,23 @@
     <body>
         <div class="container">
             <nav class="navbar navbar-expand-lg navbar-dar bg-dark">
-                <a class="navbar-brand" href="#">InvoiceMe</a>
+                <a class="navbar-brand" href="{% url 'invoice:index' %}">InvoiceMe</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item active">
-                            <a class="nav-link" href="#">Home</a>
+                            <a class="nav-link" href="{% url 'invoice:index' %}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Generate Invoice</a>
+                            <a class="nav-link" href="{% url 'invoice:createInvoice' %}">Create Invoice</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Recent Invoices</a>
+                            <a class="nav-link" href="{% url 'invoice:invoiceHistory' %}">Invoice History</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Add Products/Clients</a>
+                            <a class="nav-link" href="{% url 'invoice:addProductsClients' %}">Add Products/Clients</a>
                         </li>
                     </ul>
                 </div>
