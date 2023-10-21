@@ -118,9 +118,14 @@
 </form>
 
 
-<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-<script>let invoice_pk = '{{ invoice }}';</script>
-<script>let site_url = '{{ site_url }}';</script>
+<script src="https://code.jquery.com/jquery-3.5.1.js" ></script>
+<script>
+let invoice_pk = '{{ invoice }}';
+let site_url = '{{ site_url }}';
+let apiUrl = "{% url 'invoice:itemInvoiceAPI' invoice_pk %}";
+let crsfToken = '{% csrf_token %}';
+</script>
+
 <script src="{% static 'js/addItems.js' %}"></script>
 
 {% endblock content %}
