@@ -15,12 +15,72 @@ from django.conf import settings
 from django.core.paginator import Paginator, Page
 from django.conf import settings
 from django.urls import reverse
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from .decorators import *
+from datetime import date
+
+@unauthenticated_user
+def registerPage(request):
+    form = CreateUserForm()
+
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            user = form.cleaned_data.get('username')
+            messages.success(request, 'Account was created for ' + user)
+            
+            return redirect('invoice:loginPage')
+
+    context = {'form': form}
+
+    return render(request, 'accounts/register.html', context)
+
+@unauthenticated_user
+def loginPage(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('invoice:home')
+        else:
+            messages.info(request, 'Username Or Password is incorrect')
+    
+    context = {}
+
+    return render(request, 'accounts/login.html', context)
 
 
+def logoutUser(request):
+    logout(request)
+    return redirect('invoice:loginPage')
 
-def index(request):
+
+def landingPage(request):
     context= {}
-    return render(request, 'index/index.html', context)
+    return render(request, 'index/landing.html', context)
+
+
+
+def check_login(request):
+    if request.user.is_authenticated:
+        return redirect('invoice:home')
+    else:
+        # Handle the case where the user is not authenticated.
+        return redirect('invoice:loginPage')
+
+
+@login_required(login_url='invoice:loginPage')
+def home(request):
+    context= {}
+    return render(request, 'index/home.html', context)
 
 @api_view(['POST'])
 def createInvoiceAPI(request):
@@ -124,6 +184,34 @@ def deleteInvoiceItemAPI(request, id):
         invoice_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+# this is probably how i should do it
+@login_required(login_url='invoice:loginPage')
+def createInvoice2(request):
+    clients2 = Client.objects.all()
+    clientFilter2 = ClientFilter(request.GET, queryset=clients2)
+    clients2 = clientFilter2.qs
+
+    form2 = InvoiceForm2(request.POST) 
+
+    if request.method == 'POST':
+        
+        if form2.is_valid():
+            # Save the form to create an invoice
+            invoice=form2.save()
+            # Redirect to the next step (e.g., 'addItems') with the invoice ID
+            return redirect('invoice:addItems', invoice_id=invoice.id)
+
+    context = {
+        'form2': form2,
+        'clients': clients2,
+        'clientFilter': clientFilter2
+    }
+
+    return render(request, 'invoice/createInvoice.html', context)
+
+
+@login_required(login_url='invoice:loginPage')
 def createInvoice(request):
     clients = Client.objects.all()
     clientFilter = ClientFilter(request.GET, queryset=clients)
@@ -132,9 +220,11 @@ def createInvoice(request):
         form = InvoiceForm(request.POST)
         if form.is_valid():
             client_id = form.cleaned_data['client'].id 
-            invoice_date = form.cleaned_data['invoice_date']
 
-            invoice_date_str = invoice_date.strftime('%Y-%m-%d')
+            today = date.today()
+
+            # Format the date as a string in 'YYYY-MM-DD' format
+            invoice_date_str = today.strftime('%Y-%m-%d')
 
 
             # Create the API payload using the serialized client data
@@ -183,6 +273,7 @@ def createInvoice(request):
 
     return render(request, 'invoice/createInvoice.html', context)
 
+@login_required(login_url='invoice:loginPage')
 def addItems(request, invoice_id):
     invoice = Invoice.objects.get(pk=invoice_id)
     client = invoice.client
@@ -230,7 +321,7 @@ def addItems(request, invoice_id):
 
     return render(request, 'invoice/addItems.html', context)
 
-
+@login_required(login_url='invoice:loginPage')
 def invoiceHistory(request):
     all_invoices = Invoice.objects.order_by('-created_at')  # Ordering by created_at in descending order
     paginator = Paginator(all_invoices, 10)  # Display 10 invoices per page (you can adjust the number)
@@ -240,13 +331,17 @@ def invoiceHistory(request):
 
     return render(request, 'invoice/invoiceHistory.html', context)
 
+
+@login_required(login_url='invoice:loginPage')
+@allowed_users(allowed_roles=['admin'])
 def addProductsClients(request):
 
     context = {}
 
     return render(request, 'invoice/addProductsClients.html', context)
 
-
+@login_required(login_url='invoice:loginPage')
+@allowed_users(allowed_roles=['admin'])
 def createClient(request):
     if request.method == 'POST':
         client_form = ClientForm(request.POST)
@@ -259,6 +354,8 @@ def createClient(request):
     # Render a template or return an empty HTTP response here
     return render(request, 'invoice/createClient.html', {'client_form': client_form})
 
+@login_required(login_url='invoice:loginPage')
+@allowed_users(allowed_roles=['admin'])
 def createProduct(request):
     if request.method == 'POST':
         productForm = ProductForm(request.POST)
@@ -272,7 +369,8 @@ def createProduct(request):
     
     return render(request, 'invoice/createProduct.html', {'productForm':productForm})
 
-
+@login_required(login_url='invoice:loginPage')
+@allowed_users(allowed_roles=['admin'])
 def createProductType(request):
     if request.method == 'POST':
         productTypeForm = ProductTypeForm(request.POST)
@@ -285,3 +383,8 @@ def createProductType(request):
         productTypeForm = ProductTypeForm()
     
     return render(request, 'invoice/createProductType.html', {'productTypeForm':productTypeForm})
+
+
+
+
+

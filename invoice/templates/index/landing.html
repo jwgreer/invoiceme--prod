@@ -1,0 +1,13 @@
+<p>landing page</p>
+
+<div>
+    {% if user.is_authenticated %}
+        <a href="{% url 'invoice:home' %}" class="'nav-item nav-link">Home</a>
+    {% else %}
+        <form method="post" action="{% url 'invoice:check_login' %}">
+            {% csrf_token %}
+            <button type="submit">Login</button>
+        </form>
+    {% endif %}
+
+</div>

@@ -2,8 +2,21 @@ from django import forms
 from .models import Client, Product, Invoice, ProductType, Product, InvoiceItem
 from django.forms import formset_factory
 import datetime
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.utils import timezone
 
 
+class InvoiceForm2(forms.ModelForm):
+    class Meta:
+        model = Invoice
+        fields = ['client', 'invoice_date', 'items', 'status']  # Add other fields as needed
+
+
+class CreateUserForm(UserCreationForm):
+    class Meta:
+        model = User  # Use 'model' instead of 'models'
+        fields = ['username', 'email', 'password1', 'password2']
 
 class ClientForm(forms.ModelForm):
     class Meta:
@@ -31,7 +44,6 @@ InvoiceItemFormSet = formset_factory(InvoiceItemForm, extra=1)
 
 class InvoiceForm(forms.Form):
     client = forms.ModelChoiceField(queryset=Client.objects.all(), empty_label=None)
-    invoice_date = forms.DateField(initial=datetime.date.today, widget=forms.HiddenInput())
     # You can add more fields here as needed
 
 
@@ -49,3 +61,4 @@ class InvoiceItemFormEdit(forms.ModelForm):
     class Meta:
         model = InvoiceItem
         fields = ['product', 'quantity']
+

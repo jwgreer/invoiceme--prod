@@ -6,14 +6,20 @@ from django.conf.urls.static import static
 app_name = 'invoice'
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.landingPage, name='landingPage'),
+    path('home/', views.home, name='home'),
     path('createInvoice/', views.createInvoice, name='createInvoice'),
+    path('createInvoice2/', views.createInvoice2, name='createInvoice2'),
     path("invoiceHistory/", views.invoiceHistory, name="invoiceHistory"),
     path("addProductsClients/", views.addProductsClients, name="addProductsClients"),
     path('addItems/<int:invoice_id>/', views.addItems, name='addItems'),
     path("createClient/", views.createClient, name="createClient"),
     path('products/createProduct/', views.createProduct, name="createProduct"),
     path('products/createProductType/', views.createProductType, name="createProductType"),
+    path('register/', views.registerPage, name="registerPage"),
+    path('login/', views.loginPage, name="loginPage"),
+    path('logout/', views.logoutUser, name="logout"),
+    path('check-login/', views.check_login, name='check_login'),
 
 
 
