@@ -3,12 +3,22 @@
 
 
 {% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="d-grid gap-2 col-6 mx-auto">
+    <a href="#" target="_blank" class="btn btn-primary">Preview PDF</a>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <h1>Add Items to Invoice</h1>
+    </div>
+    
+</div>
 
-<h1>Add Items to Invoice</h1>
 
 <div class="row">
-    <div class="col-md-5">
-        <table id="item-table">
+    <div class="col-md-5 card card-body">
+        <table class="table" id="item-table">
             <tr>
                 <th>Product Name</th>
                 <th>Unit Price</th>
@@ -20,10 +30,10 @@
     </div>
     
 
-    <div class="col-md-7">
+    <div class="col-md-7 ">
         <div style="height: 400px;">
         
-            <div>
+            <div class="card card-body">
                 <form method="get">
                     {{myFilter.form.as_table}}
                     <button class="btn btn-primary">Search</button>
@@ -31,8 +41,8 @@
                 </form>
             </div>
 
-            <div>
-                <table>
+            <div class="card card-body">
+                <table class="item-table">
                     <tr>
                         <th>Name</th>
                         <th>Description</th>
@@ -100,11 +110,7 @@
 
         <button type="submit">Add Item</button>
     </form>
-    <div class="col-md-5">
-        <div class="d-grid gap-2 col-6 mx-auto">
-    <a href="#" target="_blank" class="btn btn-primary">Preview PDF</a>
-        </div>
-    </div>
+    
 </div>
 
 
