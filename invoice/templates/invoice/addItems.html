@@ -42,7 +42,7 @@
                         <th>Add Item</th>
                     </tr>
                     {% for i in products %}
-                        <form method="post" action="{% url 'invoice:itemInvoiceAPI' invoice_pk %}">
+                        <form method="post" id="task-form" data-url="{% url 'invoice:itemInvoiceAPI' invoice_pk %}">
                             {% csrf_token %}
                             <tr>
                                 <td>{{ i.name }}</td>
