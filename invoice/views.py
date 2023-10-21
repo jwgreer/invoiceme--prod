@@ -245,3 +245,43 @@ def addProductsClients(request):
     context = {}
 
     return render(request, 'invoice/addProductsClients.html', context)
+
+
+def createClient(request):
+    if request.method == 'POST':
+        client_form = ClientForm(request.POST)
+        if client_form.is_valid():
+            client_form.save()
+            return redirect('invoice:addProductsClients')  # Redirect back to your main view or a success page
+    else:
+        client_form = ClientForm()
+
+    # Render a template or return an empty HTTP response here
+    return render(request, 'invoice/createClient.html', {'client_form': client_form})
+
+def createProduct(request):
+    if request.method == 'POST':
+        productForm = ProductForm(request.POST)
+        if productForm.is_valid():
+            # Process the form data and save the object
+            productForm.save()
+            # Redirect or perform other actions
+            return redirect('invoice:addProductsClients')
+    else:
+        productForm = ProductForm()
+    
+    return render(request, 'invoice/createProduct.html', {'productForm':productForm})
+
+
+def createProductType(request):
+    if request.method == 'POST':
+        productTypeForm = ProductTypeForm(request.POST)
+        if productTypeForm.is_valid():
+            # Process the form data and save the object
+            productTypeForm.save()
+            # Redirect or perform other actions
+            return redirect('invoice:addProductsClients')
+    else:
+        productTypeForm = ProductTypeForm()
+    
+    return render(request, 'invoice/createProductType.html', {'productTypeForm':productTypeForm})

@@ -1,6 +1,9 @@
 
 var api = apiUrl;
 
+/*
+No longer needed afer fixing cors issue
+
 $(document).ready(function () {
     $(document).on('click', '.add-item', function () {
         var form = $(this).closest('form');
@@ -36,7 +39,7 @@ function populateTable(apiUrl) {
         }
     });
 }
-
+*/
 
 function getCSRFToken() {
     const cookieValue = document.cookie

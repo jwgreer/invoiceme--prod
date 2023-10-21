@@ -109,15 +109,6 @@
 
 
 
-<form method="post" id="task-form" data-url="{% url 'invoice:itemInvoiceAPI' invoice_pk %}">
-    {% csrf_token %}
-    <input type="hidden" name="product" value="{{products.id}}">
-    <input type="hidden" name="invoice" value="{{invoice_pk}}">
-    <input type="hidden" name="quantity" value="1">
-    <button type="button" class="add-item">Add Item</button>
-</form>
-
-
 <script src="https://code.jquery.com/jquery-3.5.1.js" ></script>
 <script>
 let invoice_pk = '{{ invoice }}';
