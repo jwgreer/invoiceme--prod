@@ -23,4 +23,4 @@ urlpatterns = [
     path('invoice/api/editInvoiceItem/<int:invoice_pk>/<int:id>/', views.editInvoiceItemAPI, name="editInvoiceItemAPI"),
     path('invoice/api/deleteInvoiceItem/<int:id>/', views.deleteInvoiceItemAPI, name="deleteInvoiceItemAPI"),
 
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] 
