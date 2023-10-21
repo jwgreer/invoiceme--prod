@@ -56,7 +56,7 @@ def itemInvoiceAPI(request, invoice_pk):
             return Response(serializer.data)
         except InvoiceItem.DoesNotExist:
             return Response([], status=status.HTTP_200_OK)  # Return an empty list if no items are found for the given invoice
-    if request.method == "POST":
+    elif request.method == "POST":
         serializer = invoiceItemSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -65,7 +65,6 @@ def itemInvoiceAPI(request, invoice_pk):
     # Handle other HTTP methods
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    return
 
 @api_view(['GET'])
 def productsIDAPI(request, id):
@@ -226,6 +225,7 @@ def addItems(request, invoice_id):
         'products': products,
         'myFilter': myFilter,
         'site_url': site_url,
+        'invoice_pk': invoice,
     }
 
     return render(request, 'invoice/addItems.html', context)

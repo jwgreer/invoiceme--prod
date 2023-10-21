@@ -3,7 +3,6 @@
 
 
 {% block content %}
-<div id="hiddenDataDiv" data-custom-data="{{ invoice }}"></div>
 
 <h1>Add Items to Invoice</h1>
 
@@ -20,6 +19,7 @@
         </table>
     </div>
     
+
     <div class="col-md-7">
         <div style="height: 400px;">
         
@@ -42,14 +42,23 @@
                         <th>Add Item</th>
                     </tr>
                     {% for i in products %}
-                        <form method="post" action="#">
+                        <form method="post" action="{% url 'invoice:itemInvoiceAPI' invoice_pk %}">
+                            {% csrf_token %}
                             <tr>
                                 <td>{{ i.name }}</td>
                                 <td>{{ i.description }}</td>
                                 <td>{{ i.price }}</td>
                                 <td>{{ i.product_type }}</td>
-                                <td><input type="number" name="quantity" placeholder="quantity" min="1"/></td>
-                                <td><button type="submit">Add Item</button></td>
+                                <td>
+                                    <!-- Hidden input to capture product data -->
+                                    <input type="hidden" name="product" value="{{ i.pk }}">
+                                    <input type="hidden" name="invoice" value="{{ invoice_pk }}">
+                                    
+
+                                    <!-- Input for quantity -->
+                                    <input type="number" name="quantity" placeholder="quantity" min="1"/>
+                                </td>
+                                <td><button type="submit">Add Item 1</button></td>
                             </tr>
                         </form>
                     {% endfor %}
@@ -98,7 +107,19 @@
     </div>
 </div>
 
-<script>let invoiceValue = '{{ invoice }}';</script>
+
+
+<form method="post" id="task-form" data-url="{% url 'invoice:itemInvoiceAPI' invoice_pk %}">
+    {% csrf_token %}
+    <input type="hidden" name="product" value="1">
+    <input type="hidden" name="invoice" value="43">
+    <input type="hidden" name="quantity" value="1">
+    <button type="button" class="add-item">Add Item</button>
+</form>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script>let invoice_pk = '{{ invoice }}';</script>
 <script>let site_url = '{{ site_url }}';</script>
 <script src="{% static 'js/addItems.js' %}"></script>
 
