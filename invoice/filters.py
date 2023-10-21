@@ -6,9 +6,7 @@ import re
 
 
 class ClientFilter(django_filters.FilterSet):
-    name = django_filters.ModelChoiceFilter(
-        field_name='name', queryset=Client.objects.all(), label='Client Name'
-    )
+    name = django_filters.CharFilter(field_name='name', lookup_expr='icontains', label='Product Name')
 
     class Meta:
         model = Client

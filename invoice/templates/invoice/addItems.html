@@ -3,10 +3,10 @@
 
 
 {% block content %}
-<div class="row">
+<div class="row" style="margin: 15px 0px 0px 30px;">
     <div class="col-md-4">
         <div class="d-grid gap-2 col-6 mx-auto">
-    <a href="#" target="_blank" class="btn btn-primary">Preview PDF</a>
+    <a href="{% url 'invoice:pdf' invoice %}" target="_blank" class="btn btn-primary">Preview PDF</a>
         </div>
     </div>
     <div class="col-md-8">
@@ -16,7 +16,7 @@
 </div>
 
 
-<div class="row">
+<div class="row" style="min-height: 600px;">
     <div class="col-md-5 card card-body">
         <table class="table" id="item-table">
             <tr>
@@ -31,51 +31,49 @@
     
 
     <div class="col-md-7 ">
-        <div style="height: 400px;">
+        <div>
         
-            <div class="card card-body">
+            <div class="card card-body" style="margin-bottom: 15px;">
                 <form method="get">
                     {{myFilter.form.as_table}}
                     <button class="btn btn-primary">Search</button>
-                    <a class="btn btn-warning" href="#">Reset</a>
+                    <a class="btn btn-warning" href="{% url 'invoice:addItems' invoice%}">Reset</a>
                 </form>
             </div>
 
-            <div class="card card-body">
-                <table class="item-table">
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                        <th>Product Type</th>
-                        <th>Quantity</th>
-                        <th>Add Item</th>
-                    </tr>
-                    {% for i in products %}
-                        <form method="post" id="task-form" data-url="{% url 'invoice:itemInvoiceAPI' invoice_pk %}">
-                            {% csrf_token %}
+            <div class="card card-body" style="min-height: 500px;">
+                <form method="post" id="invoiceForm">
+                    {% csrf_token %}
+                    <table class="table">
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Product Type</th>
+                            <th>Quantity</th>
+                            <th>Add Item</th>
+                        </tr>
+                        {% for i in products %}
                             <tr>
                                 <td>{{ i.name }}</td>
                                 <td>{{ i.description }}</td>
                                 <td>{{ i.price }}</td>
                                 <td>{{ i.product_type }}</td>
                                 <td>
-                                    <!-- Hidden input to capture product data -->
+                                    <input type="number" class="quantity-input" name="quantity"required min="1">
                                     <input type="hidden" name="product" value="{{ i.pk }}">
                                     <input type="hidden" name="invoice" value="{{ invoice_pk }}">
-                                    
-
-                                    <!-- Input for quantity -->
-                                    <input type="number" name="quantity" placeholder="quantity" min="1"/>
                                 </td>
-                                <td><button type="submit">Add Item 1</button></td>
+                                <td>
+                                    <button type="button" class="submit-button">Add Item</button>
+                                </td>
                             </tr>
-                        </form>
-                    {% endfor %}
-                </table>
+                        {% endfor %}
+                    </table>
+                </form>
             </div>
         </div>
-        <div class="pagination text-center">
+        <div class="pagination text-center" >
             <span class="step-links">
                 {% if products.has_next %}
                     <a href="?page={{ products.paginator.num_pages }}">last</a>
@@ -93,29 +91,6 @@
             </span>
         </div>
     </div>
-</div>
-
-
-
-
-
-
-<div class="row">
-    <form id="invoiceForm">
-        <label for="product">Product:</label>
-        <select id="product" name="product" required>
-            <option value="">Select a product</option>
-            {% for product in products %}
-                <option value="{{ product.id }}">{{ product.name }}</option>
-            {% endfor %}
-        </select><br><br>
-
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" name="quantity" required min="1"><br><br>
-
-        <button type="submit">Add Item</button>
-    </form>
-    
 </div>
 
 

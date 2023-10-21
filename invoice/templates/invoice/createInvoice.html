@@ -7,10 +7,10 @@
     <div class="col-md-8">
         <div>
             <div class="card card-body">
-                <form method="get">
+                <form method="get" action="{% url 'invoice:createInvoice' %}" id="filter-form">
                     {{ clientFilter.form }}
                     <button class="btn btn-primary" type="submit">Search</button>
-                    <a class="btn btn-warning" href="#">Reset</a>
+                    <a class="btn btn-warning" href="{% url 'invoice:createInvoice' %}">Reset</a>
                 </form>
             </div>
         </div>
@@ -39,7 +39,5 @@
     <div class="col-2"></div>
 </div>
 
-
-</div>
 
 {% endblock content %}

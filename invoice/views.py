@@ -21,6 +21,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .decorators import *
 from datetime import date
+import io
+from reportlab.lib.units import inch
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 '''
 @unauthenticated_user
@@ -385,7 +389,99 @@ def createProductType(request):
     
     return render(request, 'invoice/createProductType.html', {'productTypeForm':productTypeForm})
 
+def pdf(request, invoice_id):
+    invoice = Invoice.objects.get(pk=invoice_id)
+    items = InvoiceItem.objects.filter(invoice=invoice)
+    #if len(items) == 0:
+    #    items = ""
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
 
+    # Create the PDF object, using the buffer as its "file."
+    p = canvas.Canvas(buffer, pagesize=letter, bottomup=0)
+    p.translate(inch,inch)
+    p.setFont("Helvetica", 12)
+    p.setStrokeColorRGB(0.1,0.8,0.1)
+    p.setFillColorRGB(0,0,1) # font colour
+    p.drawString(0, .25*inch, "Client Name: " + invoice.client.name)
+    p.drawString(0, .5*inch, "Address: "+invoice.client.address)
+    p.drawString(-.5, -.5*inch, "LOGO")
+    p.setFillColorRGB(0,0,0) # font colour
+    p.line(0,.6*inch,6.8*inch,.6*inch)
+    p.line(0,9.2*inch,6.8*inch,9.2*inch)
+    p.drawString(5.75*inch,-.50*inch, "Invoice Number: " + str(invoice.invoice_num))
+    from  datetime import date
+    dt = date.today().strftime('%d-%b-%Y')
+    p.drawString(6*inch,-.25*inch,dt)
+    p.setFont("Helvetica", 8)
+    p.drawString(3*inch,-.50*inch,'Tax No :# ABC1234')
+    p.setFillColorRGB(1,0,0) # font colour
+    p.setFont("Times-Bold", 40)
+    p.drawString(4.3*inch,.5*inch,'INVOICE')
+
+    p.setFillColorRGB(0,0,0) # font colour
+    p.setFont("Times-Roman", 22)
+    p.drawString(.5*inch,1*inch,'Products')
+    p.drawString(3.5*inch,1*inch,'Price')
+    p.drawString(4.5*inch,1*inch,'Quantity')
+    p.drawString(6*inch,1*inch,'Total')
+
+
+    p.setStrokeColorCMYK(0,0,0,1) # vertical line colour 
+    p.line(3.35*inch,6.2*inch,3.35*inch,1.1*inch)# first vertical line
+    p.line(4.35*inch,6.2*inch,4.35*inch,1.1*inch)# second vertical line
+    p.line(5.85*inch,6.2*inch,5.85*inch,1.1*inch)# third vertical line
+    p.line(0.25*inch,6.5*inch,6.8*inch,6.5*inch)# horizontal line total 
+    
+    p.setFont("Times-Roman", 18)
+    y = 110
+    for item in items:
+        product = item.product
+        p.drawString(.5*inch, y, item.product.name)
+        p.drawString(4.5*inch, y, str(item.quantity))
+        p.drawString(3.5*inch, y, str(product.price))
+        subtotal = item.quantity * product.price
+        p.drawString(6*inch, y, str(subtotal))
+        y += 25
+
+    p.setFont("Times-Roman", 22)
+    p.drawString(1*inch,6.8*inch,'Discount')
+    discount = 0.0
+    p.drawString(2.25*inch,6.8*inch,str(discount))
+    p.drawString(1*inch,7.2*inch,'Tax')
+    tax = .0719
+    tax_display = 7.19
+    p.drawString(2.25*inch,7.2*inch,str(tax_display))
+    p.setFont("Times-Bold", 22)
+    p.drawString(5*inch,7.6*inch,'Total')
+    p.drawString(5.6*inch,9*inch,'Signature')
+
+    # Calculate and write the total amount
+    total_amount = sum(subtotal for item in items)
+    total_amount_ = float(total_amount) * tax
+    total_amount_ = float(total_amount) + total_amount_
+    total_amount_ = round(total_amount_, 2)
+    total_amount_ = "{:.2f}".format(total_amount_)
+
+
+    p.setFillColorRGB(0,0,0)
+    p.setFont("Times-Bold", 22)
+    p.drawString(6*inch,7.6*inch,"$"+str(total_amount_))
+
+    p.setFont("Helvetica", 8) # font size
+    p.setFillColorRGB(1,0,0) # font colour
+    p.drawString(0, 9.5*inch, u"\u00A9"+" invoiceme.com")
+
+    p.showPage()
+    p.save()
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="invoice.pdf"'
+
+    return response
 
 
 

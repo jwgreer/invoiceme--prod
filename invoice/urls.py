@@ -13,6 +13,7 @@ urlpatterns = [
     path("invoiceHistory/", views.invoiceHistory, name="invoiceHistory"),
     path("addProductsClients/", views.addProductsClients, name="addProductsClients"),
     path('addItems/<int:invoice_id>/', views.addItems, name='addItems'),
+    path("pdf/<int:invoice_id>", views.pdf, name="pdf"),
     path("createClient/", views.createClient, name="createClient"),
     path('products/createProduct/', views.createProduct, name="createProduct"),
     path('products/createProductType/', views.createProductType, name="createProductType"),

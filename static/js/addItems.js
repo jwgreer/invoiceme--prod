@@ -1,6 +1,8 @@
 
 var api = apiUrl;
 
+
+
 /*
 No longer needed afer fixing cors issue
 
@@ -50,6 +52,8 @@ function getCSRFToken() {
 }
 
 function postInvoiceData(invoice, product, quantity) {
+    console.log(product)
+    console.log(quantity)
     const apiUrl = site_url+ '/invoice/api/itemInvoice/' + invoice_pk + '/';
     const postData = {
         invoice: invoice_pk,
@@ -160,17 +164,18 @@ function getInvoiceData() {// Replace with the actual Django template variable
     .catch(error => console.error('Error:', error));
 }
 
+
+
 function getNewestItem(invoice_pk) {
-    const apiUrl = site_url + '/invoice/api/newestProduct/' +invoice_pk +'/'; // Declare these variables at a higher scope
-    let quantity;
-    let id;
+    const apiUrl = site_url + '/invoice/api/newestProduct/' + invoice_pk + '/';
+    const headers = new Headers({
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken(),
+    });
 
     return fetch(apiUrl, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(), // Include the CSRF token in the request headers if needed
-        },
+        headers: headers,
     })
     .then(response => {
         if (response.ok) {
@@ -181,27 +186,23 @@ function getNewestItem(invoice_pk) {
     })
     .then(data => {
         if (data.length > 0) {
-            const firstItem = data[0]; // Get the first object in the array
+            const firstItem = data[0];
             const productId = firstItem.product;
-            quantity = firstItem.quantity; // Assign quantity to the variable
-            testInvoice = firstItem.invoice;
-            id = firstItem.id; // Assign testInvoice to the variable
-            return callProductApi(productId);
+            const quantity = firstItem.quantity;
+            const id = firstItem.id;
+            return callProductApi(productId)
+                .then(productData => {
+                    const newestItem = {
+                        name: productData.name,
+                        price: productData.price,
+                        quantity: quantity,
+                        id: id
+                    };
+                    return newestItem;
+                });
         } else {
             throw new Error('No data found in the response.');
         }
-    })
-    .then(productData => {
-
-        // You can create a 'newestItem' object with the data you need
-        const newestItem = {
-            name: productData.name,
-            price: productData.price,
-            quantity: quantity,
-            id: id // You can access the 'quantity' from the initial response
-        };
-
-        return newestItem;
     });
 }
 
@@ -342,6 +343,35 @@ table.addEventListener('click', function(event) {
             }
         
     }
+});
+
+
+const addItemButtons = document.querySelectorAll(".submit-button");
+
+addItemButtons.forEach(button => {
+    button.addEventListener("click", function (e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        // Get the input values for this specific row
+        const quantityInput = this.parentElement.parentElement.querySelector(".quantity-input");
+        const productInput = this.parentElement.parentElement.querySelector("input[name='product']");
+        const invoiceInput = this.parentElement.parentElement.querySelector("input[name='invoice']");
+
+        // Get the input values from the DOM elements
+        const quantity = quantityInput.value;
+        const product = productInput.value;
+        const invoice = invoiceInput.value;
+
+        // Log the input values to the console
+        console.log({
+            quantity,
+            product,
+            invoice,
+        });
+
+        // Call the postDataAndGetData function with the input values
+        postDataAndGetData(invoice, product, quantity);
+    });
 });
 
 
