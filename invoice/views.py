@@ -22,6 +22,7 @@ from django.contrib.auth.decorators import login_required
 from .decorators import *
 from datetime import date
 
+'''
 @unauthenticated_user
 def registerPage(request):
     form = CreateUserForm()
@@ -38,7 +39,7 @@ def registerPage(request):
     context = {'form': form}
 
     return render(request, 'accounts/register.html', context)
-
+'''
 @unauthenticated_user
 def loginPage(request):
     if request.method == 'POST':
