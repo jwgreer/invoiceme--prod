@@ -1,13 +1,76 @@
-<p>landing page</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>InvoiceMe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 36px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        p {
+            font-size: 18px;
+        }
+        .cta-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to InvoiceMe</h1>
+    </header>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="content">
+                    <p>
+                        Thank you for visiting our website. We are here to provide you with the best products and services. 
+                        Explore our website to learn more about what we offer. 
+                        For any questions or complaints, please <a href="mailto:jwgreer2@gmail.com">email us</a>.
+                    </p>
+                    <div>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'invoice:home' %}" class="btn btn-primary cta-button">Home</a>
+                        {% else %}
+                            <form method="post" action="{% url 'invoice:check_login' %}">
+                                {% csrf_token %}
+                                <button class="btn btn-primary cta-button" type="submit">Login</button>
+                            </form>
+                        {% endif %}
 
-<div>
-    {% if user.is_authenticated %}
-        <a href="{% url 'invoice:home' %}" class="'nav-item nav-link">Home</a>
-    {% else %}
-        <form method="post" action="{% url 'invoice:check_login' %}">
-            {% csrf_token %}
-            <button type="submit">Login</button>
-        </form>
-    {% endif %}
-
-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>
