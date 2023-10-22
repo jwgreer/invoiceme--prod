@@ -1,7 +1,9 @@
 from django.urls import path
 from . import views
+from trackingCard import views as trackingCardViews
 from django.conf import settings
 from django.conf.urls.static import static
+
 
 app_name = 'invoice'
 
@@ -21,6 +23,7 @@ urlpatterns = [
     path('login/', views.loginPage, name="loginPage"),
     path('logout/', views.logoutUser, name="logout"),
     path('check-login/', views.check_login, name='check_login'),
+    path('trackingCards/', trackingCardViews.trackingCards, name='trackingCards'),
 
 
 

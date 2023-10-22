@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'invoice.apps.InvoiceConfig',
+    'trackingCard.apps.TrackingcardConfig',
+    
 ]
 
 MIDDLEWARE = [
