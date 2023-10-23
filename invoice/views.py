@@ -406,6 +406,7 @@ def createProductType(request):
     
     return render(request, 'invoice/createProductType.html', {'productTypeForm':productTypeForm})
 
+@login_required(login_url='invoice:loginPage')
 def pdf(request, invoice_id):
     invoice = Invoice.objects.get(pk=invoice_id)
     items = InvoiceItem.objects.filter(invoice=invoice)

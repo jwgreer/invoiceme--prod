@@ -22,7 +22,7 @@ def trackingCards(request):
 
 
 
-
+@login_required(login_url='invoice:loginPage')
 def pdfTracker(request):
     invoice_id = 62
     invoice = Invoice.objects.get(pk=invoice_id)
@@ -122,62 +122,3 @@ def pdfTracker(request):
 
     return response
 
-'''
-def pdfTracker(request):
-
-    buffer = io.BytesIO()
-    num_items = 3  # Example number of items
-
-    # Create the PDF object with landscape orientation, using the buffer as its "file."
-    p = canvas.Canvas(buffer, pagesize=landscape(letter), bottomup=0)
-    
-    items_per_page = 3
-    items_processed = 0
-    x= -0.6
-    x1=2.4
-
-    for page_num in range(1, num_items // items_per_page + 1):  # Calculate number of pages based on items
-        # Your content and drawing instructions go here
-        p.translate(1*inch, 1*inch)  # Adjust as needed for your content placement
-        p.drawString(-.7*inch, -.7*inch, f'Page {page_num}')
-
-        p.line(x*inch,-0.5*inch,x1*inch,-0.5*inch)# top horizontal line total
-        p.line(x*inch,7.0*inch,x*inch,-0.5*inch)# right first vertical line
-        p.line(x1*inch,7.0*inch,x1*inch,-0.5*inch)# left vertical line
-        p.line(x*inch,7.0*inch,x1*inch,7.0*inch)# bottom horizontal line total  
-
-        x = x + 3.6
-        x1 = x1+ 3.6
-
-        p.line(x*inch,-0.5*inch,x1*inch,-0.5*inch)# top horizontal line total
-        p.line(x*inch,7.0*inch,x*inch,-0.5*inch)# right first vertical line
-        p.line(x1*inch,7.0*inch,x1*inch,-0.5*inch)# left vertical line
-        p.line(x*inch,7.0*inch,x1*inch,7.0*inch)# bottom horizontal line total 
- 
-        
-        x = x + 3.6
-        x1 = x1+ 3.6
-
-        p.line(x*inch,-0.5*inch,x1*inch,-0.5*inch)# top horizontal line total
-        p.line(x*inch,7.0*inch,x*inch,-0.5*inch)# right first vertical line
-        p.line(x1*inch,7.0*inch,x1*inch,-0.5*inch)# left vertical line
-        p.line(x*inch,7.0*inch,x1*inch,7.0*inch)# bottom horizontal line total 
-
-
-
-        
-        items_processed += items_per_page
-
-        if items_processed < num_items:
-            p.showPage()  # Move to the next page if there are more items
-
-    p.save()
-
-    # FileResponse sets the Content-Disposition header so that browsers
-    # present the option to save the file.
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename="invoice.pdf"'
-
-    return response
-'''
