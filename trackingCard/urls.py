@@ -7,4 +7,5 @@ app_name = 'trackingCard'
 
 urlpatterns = [
 
+
 ]

@@ -24,6 +24,8 @@ urlpatterns = [
     path('logout/', views.logoutUser, name="logout"),
     path('check-login/', views.check_login, name='check_login'),
     path('trackingCards/', trackingCardViews.trackingCards, name='trackingCards'),
+    path('trackingCardsPDF/', trackingCardViews.pdfTracker, name='pdfTracker'),
+     path('editInvoiceItem/<int:invoice_pk>/<int:id>/', views.editInvoiceItem, name="editInvoiceItem"),
 
 
 
@@ -35,5 +37,6 @@ urlpatterns = [
     path('invoice/api/newestProduct/<int:invoice_pk>/', views.newestProductAPI, name="newestProductAPI"),
     path('invoice/api/editInvoiceItem/<int:invoice_pk>/<int:id>/', views.editInvoiceItemAPI, name="editInvoiceItemAPI"),
     path('invoice/api/deleteInvoiceItem/<int:id>/', views.deleteInvoiceItemAPI, name="deleteInvoiceItemAPI"),
+    path('editInvoiceItemAPI/<int:invoice_pk>/<int:id>/', views.editInvoiceItemAPI, name="editInvoiceItemAPI"),
 
 ] 

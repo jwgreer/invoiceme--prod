@@ -26,6 +26,7 @@ from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 
+
 '''
 @unauthenticated_user
 def registerPage(request):
@@ -326,6 +327,22 @@ def addItems(request, invoice_id):
 
     return render(request, 'invoice/addItems.html', context)
 
+@login_required
+def editInvoiceItem(request,invoice_pk, id):
+    invoice_id = Invoice.objects.get(pk=invoice_pk)
+    item_id = InvoiceItem.objects.get(pk=id)
+    client = invoice_id.client
+    products = Product.objects.all()
+    site_url = settings.SITE_URL
+
+    context = {
+        'invoice_id': invoice_id,
+        'itemId': item_id,
+        'products': products,
+        'site_url': site_url,
+    }
+    return render(request, 'invoice/editItemForm.html', context)
+
 @login_required(login_url='invoice:loginPage')
 def invoiceHistory(request):
     all_invoices = Invoice.objects.order_by('-created_at')  # Ordering by created_at in descending order
@@ -482,6 +499,5 @@ def pdf(request, invoice_id):
     response['Content-Disposition'] = 'inline; filename="invoice.pdf"'
 
     return response
-
 
 

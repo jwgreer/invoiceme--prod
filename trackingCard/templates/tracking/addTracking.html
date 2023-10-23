@@ -1,0 +1,21 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<h1>Create Instrument Tracking Cards</h1>
+
+<div class="row" style="margin: 15px 0px 0px 30px;">
+    <div class="col-md-4">
+        <div class="d-grid gap-2 col-6 mx-auto">
+    <a href="{% url 'invoice:pdfTracker'  %}" target="_blank" class="btn btn-primary">Preview PDF for instruments on invoice 62</a>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <h3>Add Items to Tracking Cards</h3>
+        <p>Here you will be able to create the shop work order forms.</p>
+    </div>
+    
+</div>
+
+
+{% endblock content %}

@@ -37,6 +37,7 @@ class InvoiceItemForm(forms.Form):
         label="Product"
     )
     quantity = forms.IntegerField(min_value=1, label="Quantity")
+    
 
 
 InvoiceItemFormSet = formset_factory(InvoiceItemForm, extra=1)

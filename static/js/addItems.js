@@ -144,7 +144,7 @@ function getInvoiceData() {// Replace with the actual Django template variable
                 idCell.hidden = true;
                 id = item.id
                 const editLink = document.createElement('a');
-                editLink.href = site_url+'/invoice/api/editInvoiceItem/' + invoice_pk + '/' +id + '/';
+                editLink.href = site_url+'/editInvoiceItem/' + invoice_pk + '/' +id + '/';
                 editLink.onclick = function() {
                     return confirm('Are you sure you want to edit?');
                 };
@@ -362,20 +362,32 @@ addItemButtons.forEach(button => {
         const product = productInput.value;
         const invoice = invoiceInput.value;
 
-        // Log the input values to the console
-        console.log({
-            quantity,
-            product,
-            invoice,
-        });
+        // Check if the quantity is less than 1
+        if (quantity < 1) {
+            alert("Quantity must be 1 or greater.");
+            quantityInput.value = ""; // Set it to an empty string
+        } else {
+            // Log the input values to the console
+            console.log({
+                quantity,
+                product,
+                invoice,
+            });
 
-        // Call the postDataAndGetData function with the input values
-        postDataAndGetData(invoice, product, quantity);
+            // Call the postDataAndGetData function with the input values
+            postDataAndGetData(invoice, product, quantity);
+            quantityInput.value = ""; // Set it to an empty string
+        }
     });
 });
+
+
 
 
 
 document.addEventListener('DOMContentLoaded', function() {
     getInvoiceData();
 });
+
+
+

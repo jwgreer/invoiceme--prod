@@ -1,0 +1,82 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<h1>Edit Product</h1>
+
+<form id="invoiceForm">
+    {% csrf_token %}
+    <label for="product">Select Product:</label>
+    <select name="product" id="product">
+        <option value="">Select a product</option>
+        {% for product in products %}
+            <option value="{{ product.id }}">{{ product.name }}</option>
+        {% endfor %}
+    </select>
+    <label for="quantity">Quantity:</label>
+    <input type="number" id="quantity" name="quantity" required min="1"><br>
+    <p>site url {{site_url}}</p>
+    
+    <button type="submit">Submit Item</button>
+
+</form>
+
+<script>
+    let site_url = '{{ site_url }}';
+    let invoice = "{{ invoice_id }}";
+    let id = `{{ itemId.id }}`;
+    console.log(site_url)
+    // Function to extract the CSRF token from a cookie
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            .split('=')[1];
+        return cookieValue;
+    }
+
+    function putInvoiceData(invoice, product, quantity) {
+        const apiUrl = site_url + '/editInvoiceItemAPI/'+ invoice + '/' + id + '/';  // Use the correct API URL
+        const postData = {
+            invoice: invoice,
+            product: product,
+            quantity: quantity,
+        };
+
+        return fetch(apiUrl, {
+            method: 'PUT',  // Use PUT method for RESTful API
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify(postData),
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('PUT request failed');
+            }
+        });
+    }
+
+    const invoiceForm = document.getElementById('invoiceForm');
+    invoiceForm.addEventListener('submit',  e => {
+        e.preventDefault();  // Prevent the default form submission
+        const product = document.getElementById('product').value;
+        const quantity = document.getElementById('quantity').value;
+        putInvoiceData(invoice, product, quantity)
+            .then(data => {
+                // Handle the response data as needed
+
+                // Redirect to the specified URL
+                window.location.href = site_url + '/addItems/'+ invoice + '/';
+            })
+            .catch(error => {
+                // Handle any errors
+                console.error(error);
+            });
+    });
+</script>
+
+{% endblock content %}
