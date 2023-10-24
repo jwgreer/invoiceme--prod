@@ -6,14 +6,22 @@
 <div class="row" style="margin: 15px 0px 0px 30px;">
     <div class="col-md-4">
         <div class="d-grid gap-2 col-6 mx-auto">
-    <a href="{% url 'invoice:pdf' invoice %}" target="_blank" class="btn btn-primary">Preview PDF</a>
+    <a href="{% url 'invoice:pdfTracker' workOrder_id %}" target="_blank" class="btn btn-primary">Preview PDF</a>
+    <a href="{% url 'invoice:pdfCustomerTracking' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Customer Tracking PDF</a>
         </div>
     </div>
     <div class="col-md-8">
-        <h1>Add Items to Invoice</h1>
+        <h1>Add Items to Work Order</h1>
     </div>
     
 </div>
+
+<a href="{% url 'invoice:customWorkOrderItem' workOrder_id %}">
+    <button class="btn btn-primary">Add Item Not Listed</button>
+</a>
+<a>
+    <button class="btn btn-primary" id="re-order">Re-Order Table</button>
+</a>
 
 
 <div class="row" style="min-height: 600px;">
@@ -22,8 +30,8 @@
             <tr>
                 <th>Number</th>
                 <th>Product Name</th>
-                <th>Unit Price</th>
                 <th>Quantity</th>
+                <th>Description</th>
                 <th>Edit</th>
                 <th>Delete</th>
             </tr>
@@ -32,38 +40,51 @@
     
 
     <div class="col-md-7 ">
+        
         <div>
         
             <div class="card card-body" style="margin-bottom: 15px;">
                 <form method="get">
                     {{myFilter.form.as_table}}
                     <button class="btn btn-primary">Search</button>
-                    <a class="btn btn-warning" href="{% url 'invoice:addItems' invoice%}">Reset</a>
+                    <a class="btn btn-warning" href="{% url 'invoice:addItemsWorkOrder' workOrder_id %}">Reset</a>
                 </form>
             </div>
-
+            <div class="pagination text-center" >
+                <span class="step-links">
+                    {% if products.has_next %}
+                        <a href="?page={{ products.paginator.num_pages }}">last</a>
+                        <a href="?page={{ products.next_page_number }}">next</a>
+                    {% endif %}
+                
+                    <span class="current-page">
+                        Page {{ products.number }} of {{ products.paginator.num_pages }}.
+                    </span>
+                
+                    {% if products.has_previous %}
+                        <a href="?page={{ products.previous_page_number }}">previous</a>
+                        <a href="?page=1">first</a>
+                    {% endif %}
+                </span>
+            </div>
             <div class="card card-body" style="min-height: 500px;">
-                <form method="post" id="invoiceForm">
+                <form method="post" id="workOrderForm">
                     {% csrf_token %}
                     <table class="table">
                         <tr>
                             <th>Name</th>
-                            <th>Description</th>
-                            <th>Price</th>
                             <th>Product Type</th>
-                            <th>Quantity</th>
+                            <th>Description</th>
                             <th>Add Item</th>
                         </tr>
                         {% for i in products %}
                             <tr>
                                 <td>{{ i.name }}</td>
-                                <td>{{ i.description }}</td>
-                                <td>{{ i.price }}</td>
                                 <td>{{ i.product_type }}</td>
                                 <td>
-                                    <input type="number" class="quantity-input" name="quantity" required min="1">
+                                    <input type="text" name="description" id="description" maxlength="200" value="">
                                     <input type="hidden" name="product" value="{{ i.pk }}">
-                                    <input type="hidden" name="invoice" value="{{ invoice_pk }}">
+                                    <input type="hidden" name="workOrder" value="{{ workOrder_id }}">
                                 </td>
                                 <td>
                                     <button type="button" class="submit-button">Add Item</button>
@@ -74,50 +95,18 @@
                 </form>
             </div>
         </div>
-        <div class="pagination text-center" >
-            <span class="step-links">
-                {% if products.has_next %}
-                    <a href="?page={{ products.paginator.num_pages }}">last</a>
-                    <a href="?page={{ products.next_page_number }}">next</a>
-                {% endif %}
-            
-                <span class="current-page">
-                    Page {{ products.number }} of {{ products.paginator.num_pages }}.
-                </span>
-            
-                {% if products.has_previous %}
-                    <a href="?page={{ products.previous_page_number }}">previous</a>
-                    <a href="?page=1">first</a>
-                {% endif %}
-            </span>
-        </div>
     </div>
 </div>
 
-
-
 <script src="https://code.jquery.com/jquery-3.5.1.js" ></script>
 <script>
-let invoice_pk = '{{ invoice }}';
+let workOrder_id = '{{ workOrder_id }}';
 let site_url = '{{ site_url }}';
-let apiUrl = "{% url 'invoice:itemInvoiceAPI' invoice_pk %}";
+let apiUrl = "{% url 'invoice:itemWorkOrderAPI' workOrder_id %}";
 let crsfToken = '{% csrf_token %}';
+
 </script>
 
-<script src="{% static 'js/addItems.js' %}"></script>
-
-<script>
-    document.getElementById("invoiceForm").addEventListener("submit", function(event) {
-        console.log("test")
-        var quantityInputs = document.querySelectorAll(".quantity-input");
-        for (var i = 0; i < quantityInputs.length; i++) {
-            if (quantityInputs[i].value < 1) {
-                alert("Quantity must be 1 or greater.");
-                event.preventDefault(); // Prevent form submission
-                break;
-            }
-        }
-    });
-</script>
+<script src="{% static 'js/addItemsWorkOrder.js' %}"></script>
 
 {% endblock content %}

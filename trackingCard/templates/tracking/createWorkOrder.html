@@ -1,0 +1,44 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<h1>Generate your Work Order</h1>
+<h1>{{user}}</h1>
+<div class="row">
+    <div class="col-2"></div>
+    <div class="col-md-8">
+        <div>
+            <div class="card card-body">
+                <form method="get" action="{% url 'invoice:createWorkOrder' %}" id="filter-form">
+                    {{ clientFilter.form }}
+                    <button class="btn btn-primary" type="submit">Search</button>
+                    <a class="btn btn-warning" href="{% url 'invoice:createWorkOrder' %}">Reset</a>
+                </form>
+            </div>
+        </div>
+
+        <div class="card card-body">
+            <table class="table">
+                <tr>
+                    <th>Client Name</th>
+                    <th>Actions</th>
+                </tr>
+                {% for i in clients %}
+                <tr>
+                    <form method="post" action="{% url 'invoice:createWorkOrder' %}">
+                        {% csrf_token %}
+                        <td>{{ i.name }}</td>
+                        <td>
+                            <input type="hidden" name="client" value="{{ i.id }}">
+                            <button type="submit">Create Work Order</button>
+                        </td>
+                    </form>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="col-2"></div>
+</div>
+
+
+{% endblock content %}

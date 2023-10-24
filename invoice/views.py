@@ -10,8 +10,6 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from django.urls import reverse
-from django.conf import settings
 from django.core.paginator import Paginator, Page
 from django.conf import settings
 from django.urls import reverse
@@ -112,6 +110,22 @@ def clientsAllAPI(request):
         client = Client.objects.all()
         serializer = clientSerializer(client,many=True)
         return JsonResponse(serializer.data, safe=False)
+    
+@api_view(['PUT'])
+def itemInvoiceNumberAPI(request, id):
+    try:
+        item = InvoiceItem.objects.get(pk=id)  # Use get() to retrieve a single instance
+    except InvoiceItem.DoesNotExist:
+        return JsonResponse({'error': 'Item not found'}, status=404)
+    
+    if request.method == "PUT":
+        serializer = invoiceItemNumberSerializer(item, data=request.data)  # Pass request data to the serializer
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
 
 @api_view(['GET','POST'])  
 def itemInvoiceAPI(request, invoice_pk):
@@ -189,6 +203,12 @@ def deleteInvoiceItemAPI(request, id):
         # If the request method is DELETE, delete the InvoiceItem
         invoice_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@api_view(['GET']) 
+def get_invoice_item_count(request, invoice_id):
+    count = InvoiceItem.objects.filter(invoice_id=invoice_id).count()
+    data = {'count': count}
+    return JsonResponse(data)
 
 
 # this is probably how i should do it
@@ -378,6 +398,20 @@ def createClient(request):
 
 @login_required(login_url='invoice:loginPage')
 @allowed_users(allowed_roles=['admin'])
+def createClientContact(request):
+    if request.method == 'POST':
+        client_form = ClientContactForm(request.POST)
+        if client_form.is_valid():
+            client_form.save()
+            return redirect('invoice:addProductsClients')  # Redirect back to your main view or a success page
+    else:
+        client_form = ClientForm()
+
+    # Render a template or return an empty HTTP response here
+    return render(request, 'invoice/createClientContact.html', {'client_form': client_form})
+
+@login_required(login_url='invoice:loginPage')
+@allowed_users(allowed_roles=['admin'])
 def createProduct(request):
     if request.method == 'POST':
         productForm = ProductForm(request.POST)
@@ -428,7 +462,7 @@ def pdf(request, invoice_id):
     p.line(0,.6*inch,6.8*inch,.6*inch)
     p.line(0,9.2*inch,6.8*inch,9.2*inch)
     p.drawString(5.75*inch,-.50*inch, "Invoice Number: " + str(invoice.invoice_num))
-    from  datetime import date
+    
     dt = date.today().strftime('%d-%b-%Y')
     p.drawString(6*inch,-.25*inch,dt)
     p.setFont("Helvetica", 8)

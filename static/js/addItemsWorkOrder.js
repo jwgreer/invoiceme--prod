@@ -3,8 +3,8 @@ var api = apiUrl;
 
 // Assuming you have jQuery for AJAX, but you can use vanilla JavaScript as well
 
-function getInvoiceItemCount(invoiceId) {
-    return fetch(site_url + '/invoice/get_invoice_item_count/' + invoiceId + '/')
+function getWorkOrderItemCount(workOrderId) {
+    return fetch(site_url + '/workOrder/getWorkOrderItemCount/' + workOrder_id + '/')
         .then(response => response.json())
         .then(data => {
             return data.count;
@@ -14,12 +14,12 @@ function getInvoiceItemCount(invoiceId) {
         });
 }
 
-function updateInvoiceItemNumber(id, number) {
+function updateWorkOrderItemNumber(id, number) {
     const payload = {
         number: number,
     };
 
-    return fetch(site_url + '/invoice/api/invoiceItemNumber/' + id + '/', {
+    return fetch(site_url + '/workOrder/api/workOrderItemNumber/' + id + '/', {
         method: 'PUT', // Specify the HTTP method as PUT
         headers: {
             'Content-Type': 'application/json',
@@ -43,48 +43,7 @@ function updateInvoiceItemNumber(id, number) {
     });
 }
 
-// Example usage:
 
-
-/*
-No longer needed afer fixing cors issue
-
-$(document).ready(function () {
-    $(document).on('click', '.add-item', function () {
-        var form = $(this).closest('form');
-        var product = form.find('input[name="product"]').val();
-        var quantity = form.find('input[name="quantity"]').val();
-        var csrfToken = form.find('input[name="csrfmiddlewaretoken"]').val();
-        var apiUrl = apiUrl;
-
-        $.ajax({
-            type: 'POST',
-            url: apiUrl,
-            data: {
-                invoice: invoice_pk,
-                product: product,
-                quantity: quantity,
-                csrfmiddlewaretoken: csrfToken,
-            },
-            success: function (response) {
-                populateTable(apiUrl);
-                // Add code here to update the page as needed, e.g., displaying the newly added item
-            }
-        });
-    });
-});
-
-function populateTable(apiUrl) {
-    var csrfToken = crsfToken;
-    $.ajax({
-        type: 'GET',
-        url: apiUrl,
-        success: function (data) {
-            // Add code here to update the page as needed
-        }
-    });
-}
-*/
 
 function getCSRFToken() {
     const cookieValue = document.cookie
@@ -94,12 +53,15 @@ function getCSRFToken() {
     return cookieValue;
 }
 
-function postInvoiceData(invoice_pk, product, quantity) {
-    const apiUrl = site_url + '/invoice/api/itemInvoice/' + invoice_pk + '/';
+
+function postWorkOrderData(workOrder_id, product, description) {
+
+    const apiUrl = site_url + '/workOrder/api/itemWorkOrder/' + workOrder_id + '/';
     const postData = {
-        invoice: invoice_pk,
-        product: product,
-        quantity: quantity,
+        "workOrder": workOrder_id,
+        "product": product,
+        "description": description,
+        "status": "Waiting_on_Assignment",
     };
 
     return fetch(apiUrl, {
@@ -130,7 +92,30 @@ function postInvoiceData(invoice_pk, product, quantity) {
 
 
 function callProductApi(productId) {
+
     const apiUrl = site_url +'/invoice/api/productsID/' + productId + '/';
+    
+
+    return fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(), // Include the CSRF token in the request headers if needed
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error('GET request failed');
+        }
+    });
+}
+
+function callProductApiOther(productId) {
+
+    const apiUrl = site_url +'/workOrder/api/workOrderItemOther/' + productId + '/';
+    
 
     return fetch(apiUrl, {
         method: 'GET',
@@ -149,14 +134,14 @@ function callProductApi(productId) {
 }
 
 
-function getInvoiceData() {// Replace with the actual Django template variable
+function getWorkOrderData() {// Replace with the actual Django template variable
 
     const table = document.getElementById('item-table');
     while (table.rows.length > 1) {
         table.deleteRow(1);
     }
-
-    const apiUrl = site_url +'/invoice/api/itemInvoice/' + invoice_pk + '/';
+    
+    const apiUrl = site_url +'/workOrder/api/itemWorkOrder/' + workOrder_id + '/';
 
 
     fetch(apiUrl, {
@@ -177,29 +162,63 @@ function getInvoiceData() {// Replace with the actual Django template variable
             
             const row = table.insertRow();
             const numberCell = row.insertCell(0);
-            const invoiceCell = row.insertCell(1);
-            const productCell = row.insertCell(2);
-            const quantityCell = row.insertCell(3);
+            const workOrderCell = row.insertCell(1);
+            const quantityCell = row.insertCell(2);
+            const descriptionCell = row.insertCell(3);
             const editCell = row.insertCell(4);
             const deleteCell = row.insertCell(5);
             const idCell = row.insertCell(6);
 
 
             // Call the callProductApi function for each item
-            callProductApi(item.product).then(productData => {
-                console.log(productData);
+            
+            if(item.product_id == 2){
+                callProductApiOther(item.id).then(productData => {
+
+                    // Populate the cells with product data
+                    numberCell.textContent = item.number;
+                    workOrderCell.textContent = productData.name;
+                    quantityCell.textContent = item.quantity;
+                    descriptionCell.textContent = item.description;
+                    idCell.textContent = item.id;
+    
+                    // Hide the 5th cell with the ID
+                    idCell.hidden = true;
+                    id = item.id
+                    const editLink = document.createElement('a');
+                    editLink.href = site_url+'/editWorkOrderItem/' + workOrder_id + '/' +id + '/';
+                    editLink.onclick = function() {
+                        return confirm('Are you sure you want to edit?');
+                    };
+                    editLink.textContent = 'Edit';
+                    editCell.appendChild(editLink);
+                    const deleteLink = document.createElement('a');
+                    deleteLink.className = "delete-button";
+                    deleteLink.href = "#";
+                    deleteLink.onclick = function() {
+                        return confirm('Are you sure you want to delete?');
+                    };
+                    deleteLink.textContent = 'Delete';
+                    deleteCell.appendChild(deleteLink);
+                });
+
+            }
+            else{
+            
+            callProductApi(item.product_id).then(productData => {
+
                 // Populate the cells with product data
                 numberCell.textContent = item.number;
-                invoiceCell.textContent = productData.name;
-                productCell.textContent = productData.price;
+                workOrderCell.textContent = productData.name;
                 quantityCell.textContent = item.quantity;
+                descriptionCell.textContent = item.description;
                 idCell.textContent = item.id;
 
                 // Hide the 5th cell with the ID
                 idCell.hidden = true;
                 id = item.id
                 const editLink = document.createElement('a');
-                editLink.href = site_url+'/editInvoiceItem/' + invoice_pk + '/' +id + '/';
+                editLink.href = site_url+'/editWorkOrderItem/' + workOrder_id + '/' +id + '/';
                 editLink.onclick = function() {
                     return confirm('Are you sure you want to edit?');
                 };
@@ -214,6 +233,7 @@ function getInvoiceData() {// Replace with the actual Django template variable
                 deleteLink.textContent = 'Delete';
                 deleteCell.appendChild(deleteLink);
             });
+        }
         });
     })
     .catch(error => console.error('Error:', error));
@@ -221,8 +241,8 @@ function getInvoiceData() {// Replace with the actual Django template variable
 
 
 
-function getNewestItem(invoice_pk) {
-    const apiUrl = site_url + '/invoice/api/newestProduct/' + invoice_pk + '/';
+function getNewestItem(workOrder_id) {
+    const apiUrl = site_url + '/workOrder/api/newestProduct/' + workOrder_id + '/';
     const headers = new Headers({
         'Content-Type': 'application/json',
         'X-CSRFToken': getCSRFToken(),
@@ -241,13 +261,17 @@ function getNewestItem(invoice_pk) {
     })
     .then(data => {
         if (data.length > 0) {
+            
             const firstItem = data[0];
+            console.log(firstItem);
             const productId = firstItem.product;
             const quantity = firstItem.quantity;
             const id = firstItem.id;
             const number = firstItem.number;
+            const desc = firstItem.description;
             return callProductApi(productId)
                 .then(productData => {
+                    console.log(productData);
                     const newestItem = {
                         name: productData.name,
                         price: productData.price,
@@ -256,7 +280,9 @@ function getNewestItem(invoice_pk) {
                     };
                     return result = {
                         newestItem: newestItem,
-                        number: number
+                        number: number,
+                        desc: desc
+
                     };
                 });
         } else {
@@ -268,23 +294,27 @@ function getNewestItem(invoice_pk) {
 
 function getNewestItemAndAddToTable() {
     // Replace 'invoice' with the actual invoice ID
-    getNewestItem(invoice_pk).then(result => {
+    getNewestItem(workOrder_id).then(result => {
+        console.log(result);
+
         const table = document.getElementById('item-table');
         const row = table.insertRow(); // Insert a new row at the end of the table
         const numberCell = row.insertCell(0);
-        const invoiceCell = row.insertCell(1);
-        const productCell = row.insertCell(2);
-        const quantityCell = row.insertCell(3);
+        const productNameCell = row.insertCell(1);
+        const quantityCell = row.insertCell(2);
+        const descriptionCell = row.insertCell(3);
         const editCell = row.insertCell(4);
         const deleteCell = row.insertCell(5);
         const idCell = row.insertCell(6);
 
         // Add content to visible cells
+        console.log(result.desc);
 
         numberCell.textContent = result.number;
-        invoiceCell.textContent = result.newestItem.name;
-        productCell.textContent = result.newestItem.price;
-        quantityCell.textContent = result.newestItem.quantity;
+        productNameCell.textContent = result.newestItem.name;
+        quantityCell.textContent = "1";
+        descriptionCell.textContent = result.desc;
+        
 
 
         // Set a value for the hidden cell with the ID
@@ -295,7 +325,7 @@ function getNewestItemAndAddToTable() {
 
         // Create edit and delete links as before
         const editLink = document.createElement('a');
-        editLink.href = site_url+'/editInvoiceItem/'+invoice_pk+'/'+ result.newestItem.id+'/';
+        editLink.href = site_url+'/editWorkOrderItem/'+ workOrder_id +'/'+ result.newestItem.id+'/';
         editLink.onclick = function() {
             return confirm('Are you sure you want to edit?');
         };
@@ -316,8 +346,8 @@ function getNewestItemAndAddToTable() {
 
 
 
-function deleteInvoiceItem(id) {
-    const apiUrl = site_url+ '/invoice/api/deleteInvoiceItem/' +id + '/';
+function deleteWorkOrderItem(id) {
+    const apiUrl = site_url+ '/workOrder/api/deleteWorkOrderItem/' +id + '/';
 
     return fetch(apiUrl, {
         method: 'DELETE',
@@ -361,7 +391,7 @@ function renumberTable() {
         const idCell = rows[i].cells[6];
         const id = idCell.textContent;
         const number = i;
-        updateInvoiceItemNumber(id, number)
+        updateWorkOrderItemNumber(id, number)
             // Make the API call to update the item using 'id' and 'number'
  
         
@@ -369,16 +399,16 @@ function renumberTable() {
 }
 
 
-async function postDataAndGetData(invoice, product, quantity) {
+async function postDataAndGetData(workOrder_id, product, description) {
     try {
-        const data = await postInvoiceData(invoice, product, quantity);
+        const data = await postWorkOrderData(workOrder_id, product, description);
         await sleep(250); // Wait for .25 seconds
         
 
-        getInvoiceItemCount(invoice) // This is a promise
+        getWorkOrderItemCount(workOrder_id) // This is a promise
             .then(number => {
                 // Now you can call updateInvoiceItemNumber with 'number'
-                return updateInvoiceItemNumber(data.id, number);
+                return updateWorkOrderItemNumber(data.id, number);
             })
             .then(result => {
                 getNewestItemAndAddToTable();
@@ -394,13 +424,16 @@ async function postDataAndGetData(invoice, product, quantity) {
 }
 
 
-const invoiceForm = document.getElementById('invoiceForm');
-invoiceForm.addEventListener('submit',  e => {
+
+
+const workOrderForm = document.getElementById('workOrderForm');
+workOrderForm.addEventListener('submit',  e => {
+    
     e.preventDefault();  // Prevent the default form submission
     const product = document.getElementById('product').value;
-    const quantity = document.getElementById('quantity').value;
-    const invoice = "{{ invoice }}"; // You should replace this with the actual invoice value
-    postDataAndGetData(invoice, product, quantity)
+    const description = document.getElementById('description').value;
+    const workOrder_id = "{{ workOrder_id }}";
+    postDataAndGetData(workOrder_id, product, description)
         .then(data => {
             // Handle the response data as needed
         })
@@ -410,18 +443,20 @@ invoiceForm.addEventListener('submit',  e => {
         });
 });
 
+
+
 const table = document.getElementById('item-table');
 
 async function deleteDataAndGetData(itemID) {
 // Call the POST method
     try {
-        await deleteInvoiceItem(itemID);
+        await deleteWorkOrderItem(itemID);
         await sleep(250); // Wait for .25 seconds
-        await getInvoiceData();
+        await getWorkOrderData();
         await sleep(250);
         await renumberTable();
         await sleep(250); // Wait for .25 seconds
-        await getInvoiceData();
+        await getWorkOrderData();
         
         
     } catch (error) {
@@ -453,30 +488,37 @@ table.addEventListener('click', function(event) {
 
 const addItemButtons = document.querySelectorAll(".submit-button");
 
+const reOrderButton = document.getElementById("re-order");
+
+
+reOrderButton.addEventListener("click", function (e) {
+    renumberTable();
+    getWorkOrderData();
+
+});
+
 addItemButtons.forEach(button => {
     button.addEventListener("click", function (e) {
         e.preventDefault(); // Prevent the default form submission
 
+        
         // Get the input values for this specific row
-        const quantityInput = this.parentElement.parentElement.querySelector(".quantity-input");
         const productInput = this.parentElement.parentElement.querySelector("input[name='product']");
-        const invoiceInput = this.parentElement.parentElement.querySelector("input[name='invoice']");
+        const workOrderInput = this.parentElement.parentElement.querySelector("input[name='workOrder']");
+        const descriptionInput = this.parentElement.parentElement.querySelector("input[name='description']");
 
         // Get the input values from the DOM elements
-        const quantity = quantityInput.value;
         const product = productInput.value;
-        const invoice = invoiceInput.value;
+        const workOrder_id = workOrderInput.value;
+        const description = descriptionInput.value;
 
-        // Check if the quantity is less than 1
-        if (quantity < 1) {
-            alert("Quantity must be 1 or greater.");
-            quantityInput.value = ""; // Set it to an empty string
-        } else {
 
-            // Call the postDataAndGetData function with the input values
-            postDataAndGetData(invoice, product, quantity);
-            quantityInput.value = ""; // Set it to an empty string
-        }
+
+
+
+        // Call the postDataAndGetData function with the input values
+        postDataAndGetData(workOrder_id, product, description);
+        
     });
 });
 
@@ -485,9 +527,6 @@ addItemButtons.forEach(button => {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    getInvoiceData();
+    getWorkOrderData();
     
 });
-
-
-

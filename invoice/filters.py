@@ -15,9 +15,12 @@ class ClientFilter(django_filters.FilterSet):
 class ProductsFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(field_name='name', lookup_expr='icontains', label='Product Name')
     product_type = django_filters.ModelChoiceFilter(
-        field_name='product_type', queryset=ProductType.objects.all(), label='Product Type'
+        field_name='product_type', queryset=ProductType.objects.exclude(name="Other"), label='Product Type' # exclude the other option
+        #field_name='product_type', queryset=ProductType.objects.all(), label='Product Type'
     )
 
     class Meta:
         model = Product
         fields = ['name', 'product_type']
+
+

@@ -104,6 +104,22 @@ WSGI_APPLICATION = 'invoiceme.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# password
+
+#CkzdGS#$grYt3Dd
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': "django.db.backends.postgresql",
+        'NAME': "postgres_invoiceme_prod",
+        'USER': "postgres",
+        'PASSWORD': "CkzdGS#$grYt3Dd",
+        'HOST': "database-1.c0gigzyfpjdo.us-east-1.rds.amazonaws.com",
+        'PORT': "5432"
+    }
+}
+'''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

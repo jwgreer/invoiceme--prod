@@ -11,7 +11,12 @@ class invoiceSerializer(serializers.ModelSerializer):
 class invoiceItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceItem
-        fields = ['id','invoice', 'product', 'quantity']
+        fields = ['id','invoice', 'product', 'quantity', 'number']
+
+class invoiceItemNumberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceItem
+        fields = ['number']
 
 
 class clientSerializer(serializers.ModelSerializer):

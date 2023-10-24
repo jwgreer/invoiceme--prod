@@ -1,5 +1,5 @@
 from django import forms
-from .models import Client, Product, Invoice, ProductType, Product, InvoiceItem
+from .models import Client, Product, Invoice, ProductType, Product, InvoiceItem, ClientContact
 from django.forms import formset_factory
 import datetime
 from django.contrib.auth.forms import UserCreationForm
@@ -22,6 +22,12 @@ class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
         fields = ['name', 'email', 'phone', 'address']
+
+
+class ClientContactForm(forms.ModelForm):
+    class Meta:
+        model = ClientContact
+        fields = ['first_name', 'last_name', 'phone', 'email', 'client']
 
 class ClientSelectionForm(forms.Form):
     client = forms.ModelChoiceField(

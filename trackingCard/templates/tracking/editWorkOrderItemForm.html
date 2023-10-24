@@ -4,7 +4,7 @@
 
 <h1>Edit Product</h1>
 
-<form id="invoiceForm">
+<form id="workOrderForm">
     {% csrf_token %}
     <label for="product">Select Product:</label>
     <select name="product" id="product">
@@ -35,7 +35,7 @@
     }
 
     function putInvoiceData(invoice, product, quantity) {
-        const apiUrl = site_url + '/invoice/api/editInvoiceItem/'+ invoice + '/' + id + '/';  // Use the correct API URL
+        const apiUrl = site_url + '/invoice/api/editWorkOrderItem/'+ invoice + '/' + id + '/';  // Use the correct API URL
         const postData = {
             invoice: invoice,
             product: product,
@@ -59,7 +59,7 @@
         });
     }
 
-    const invoiceForm = document.getElementById('invoiceForm');
+    const invoiceForm = document.getElementById('workOrderForm');
     invoiceForm.addEventListener('submit',  e => {
         e.preventDefault();  // Prevent the default form submission
         const product = document.getElementById('product').value;
@@ -69,7 +69,7 @@
                 // Handle the response data as needed
 
                 // Redirect to the specified URL
-                window.location.href = site_url + '/addItems/'+ invoice + '/';
+                window.location.href = site_url + '/addItems/'+ workOrder_id + '/';
             })
             .catch(error => {
                 // Handle any errors
