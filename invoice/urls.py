@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 from trackingCard import views as trackingCardViews
 from django.conf import settings
@@ -35,9 +35,10 @@ urlpatterns = [
     path('createWorkOrder/', trackingCardViews.createWorkOrder, name='createWorkOrder'),
     path('addItemsWorkOrder/<int:workOrder_id>/', trackingCardViews.addItemsWorkOrder, name='addItemsWorkOrder'),
     path('customWorkOrderItem/<int:workOrder_id>/', trackingCardViews.customWorkOrderItem, name="customWorkOrderItem"),
-    path('workOrderEnrichmentForm/<int:workOrder_id>/', trackingCardViews.workOrderEnrichmentForm, name="workOrderEnrichmentForm"),
     path('editWorkOrderItem/<int:workOrder_id>/<int:id>/', trackingCardViews.editWorkOrderItem, name="editWorkOrderItem"),
     path("workOrderHistory/", trackingCardViews.workOrderHistory, name="workOrderHistory"),
+    path("deleteWorkOrderItem/<int:workOrder_id>/<int:id>/", trackingCardViews.deleteWorkOrderItem, name="deleteWorkOrderItem"),
+    path("workOrderView/<int:workOrder>/", trackingCardViews.workOrderView, name="workOrderView"),
 
 
 
@@ -58,9 +59,11 @@ urlpatterns = [
     path('workOrder/api/workOrderItemNumber/<int:id>/', trackingCardViews.itemWorkOrderNumberAPI, name='itemworkOrderNumberAPI'),
     path('workOrder/api/itemWorkOrder/<int:workOrder_id>/', trackingCardViews.itemWorkOrderAPI, name="itemWorkOrderAPI"),
     path('editWorkOrderItemAPI/<int:workOrder_id>/<int:id>/', trackingCardViews.editWorkOrderItemAPI, name="editWorkOrderItemAPI"),
-    path('workOrder/api/deleteWorkOrderItem/<int:id>/', trackingCardViews.deleteWorkOrderItemAPI, name="deleteWorkOrderItemAPI"),
+    path('workOrder/api/deleteWorkOrderItem/', trackingCardViews.deleteWorkOrderItemAPI, name="deleteWorkOrderItemAPI"),
     path('workOrder/api/newestProduct/<int:workOrder_id>/', trackingCardViews.newestWorkOrderProductAPI, name="newestWorkOrderProductAPI"),
     path('workOrder/api/workOrderItemOther/<int:id>/', trackingCardViews.workOrderItemOther, name="workOrderItemOther"),
     path('workOrder/api/editWorkOrderItem/<int:workOrder_id>/<int:id>/', trackingCardViews.editWorkOrderItemAPI, name="editWorkOrderItemAPI"),
-
+    path('workOrder/api/addColor/<int:workOrder_id>/', trackingCardViews.workOrderColorAPI, name="workOrderColorAPI"),
+    path('workOrder/api/workOrderView/', trackingCardViews.workOrderViewAPI, name="workOrderViewAPI"),
+    path('workOrder/api/workOrderEnrichment/', trackingCardViews.workOrderEnrichment, name="workOrderEnrichment"),
 ] 

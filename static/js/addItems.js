@@ -473,7 +473,7 @@ addItemButtons.forEach(button => {
             quantityInput.value = ""; // Set it to an empty string
         } else {
 
-            // Call the postDataAndGetData function with the input values
+             //Call the postDataAndGetData function with the input values
             postDataAndGetData(invoice, product, quantity);
             quantityInput.value = ""; // Set it to an empty string
         }

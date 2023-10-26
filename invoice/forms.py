@@ -42,7 +42,7 @@ class InvoiceItemForm(forms.Form):
         empty_label="Select a Product",
         label="Product"
     )
-    quantity = forms.IntegerField(min_value=1, label="Quantity")
+    quantity = forms.IntegerField(min_value=1, label="Quantity", error_messages={'min_value': 'Quantity must be at least 1'})
     
 
 

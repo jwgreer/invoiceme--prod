@@ -1,0 +1,135 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<style>
+    /* Red background for failed QC */
+    .failed {
+        background-color: red;
+    }
+
+    /* Green background for passed QC */
+    .passed {
+        background-color: green;
+    }
+</style>
+<div class="row">
+    <div class="col-10">
+        <h1>Take Back Sheet View</h1>
+    </div>
+    <div class="col-2">
+        <p>Status</p>
+    </div>
+    
+
+</div>
+
+<div class="row">
+    <form method="post" id="workOrderViewForm">
+        {% csrf_token %}
+        <table class="table">
+            <tr>
+                <th>Product</th>
+                <th>Description</th>
+                <th>Technician</th>
+                <th>Status</th>
+                <th>Quality Control</th>
+            </tr>
+            {% for i in workOrderItems %}
+                <tr class="{% if i.qc == 'QC_FAIL' %}failed{% elif i.qc == 'QC_PASS' %}passed{% endif %}">
+                    <td style="white-space: nowrap;">{{ i.product }}</td>
+                    <td>{{ i.description}}</td>
+                    <td>
+                        <select name="technician" data-item-id="{{ i.id }}">
+                            {% for tech_key, tech_value in form.technician.field.choices %}
+                                <option value="{{ tech_key }}" {% if i.technician and i.technician.id == tech_key %}selected="selected"{% endif %}>{{ tech_value }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="status" data-item-id="{{ i.id }}">
+                            {% for status_key, status_value in form.status.field.choices %}
+                                <option value="{{ status_key }}" {% if i.status == status_key %}selected="selected"{% endif %}>{{ status_value }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    
+                    <td>
+                        <select  name="qc" data-item-id="{{ i.id }}">
+                            {% for qc_key, qc_value in form.qc.field.choices %}
+                                <option value="{{ qc_key }}" {% if i.qc == qc_key %}selected="selected"{% endif %}>{{ qc_value }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </form>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Get the CSRF token from the template
+    var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
+    var apiUrl = 'http://127.0.0.1:8000/workOrder/api/workOrderView/';
+
+    // Attach a change event listener to the "technician" dropdown
+    $('select[name="technician"]').on('change', function() {
+        var selectedTechnician = $(this).val();
+        itemId = $(this).data('item-id'); // Update itemId here
+        if (!selectedTechnician) {
+            var selectedTechnician = "none";
+        }
+        console.log(selectedTechnician);
+        updateData(apiUrl, 'technician', selectedTechnician, csrfToken, itemId);
+    });
+
+    // Attach a change event listener to the "status" dropdown
+    $('select[name="status"]').on('change', function() {
+        var selectedStatus = $(this).val();
+        itemId = $(this).data('item-id');
+        if (!selectedStatus) {
+            return;
+        }
+        updateData(apiUrl, 'status', selectedStatus, csrfToken, itemId); // Use the itemId
+    });
+
+    // Attach a change event listener to the "qc" dropdown
+    $('select[name="qc"]').on('change', function() {
+        var selectedQC = $(this).val();
+        itemId = $(this).data('item-id');
+        if (!selectedQC) {
+            return;
+        }
+        updateData(apiUrl, 'qc', selectedQC, csrfToken, itemId); // Use the itemId
+    });
+
+    function updateData(apiEndpoint, type, selectedValue, csrfToken, id) {
+        // Set up the CSRF token in the request headers
+        var headers = {
+            'X-CSRFToken': csrfToken
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: apiEndpoint,
+            data: JSON.stringify({ type: type, value: selectedValue, id: id }),
+            contentType: 'application/json',
+            headers: headers, // Include the CSRF token in the headers
+            success: function(data) {
+                console.log(data);
+                location.reload();
+            },
+            error: function(error) {
+                console.error(error);
+            }
+        });
+    }
+});
+</script>
+
+
+
+{% endblock %}

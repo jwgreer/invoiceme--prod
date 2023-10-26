@@ -61,7 +61,7 @@
                                 <td>{{ i.price }}</td>
                                 <td>{{ i.product_type }}</td>
                                 <td>
-                                    <input type="number" class="quantity-input" name="quantity" required min="1">
+                                    <input type="number" class="quantity-input" name="quantity" min="1">
                                     <input type="hidden" name="product" value="{{ i.pk }}">
                                     <input type="hidden" name="invoice" value="{{ invoice_pk }}">
                                 </td>
@@ -106,18 +106,5 @@ let crsfToken = '{% csrf_token %}';
 
 <script src="{% static 'js/addItems.js' %}"></script>
 
-<script>
-    document.getElementById("invoiceForm").addEventListener("submit", function(event) {
-        console.log("test")
-        var quantityInputs = document.querySelectorAll(".quantity-input");
-        for (var i = 0; i < quantityInputs.length; i++) {
-            if (quantityInputs[i].value < 1) {
-                alert("Quantity must be 1 or greater.");
-                event.preventDefault(); // Prevent form submission
-                break;
-            }
-        }
-    });
-</script>
 
 {% endblock content %}

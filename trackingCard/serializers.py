@@ -1,7 +1,10 @@
 from rest_framework import serializers
 from invoice.models import *
 
-
+class workOrderColorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkOrders
+        fields = ['workOrder_num','color']
 
 class workOrderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,12 +15,17 @@ class workOrderSerializer(serializers.ModelSerializer):
 class workOrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkOrderItem
-        fields = ['id','workOrder', 'product','description','number','custom_product_name','custom_product_description']
+        fields = ['id', 'workOrder', 'product', 'description', 'quantity','status', 'mfgnum', 'number', 'custom_product_name', 'custom_product_description']
+
+    def validate_quantity(self, value):
+        if value is None or value < 1:
+            raise serializers.ValidationError("Quantity must be 1 or greater.")
+        return value
 
 class workOrderItemOtherSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkOrderItem
-        fields = ['id', 'workOrder', 'custom_product_name', 'custom_product_description', 'number']
+        fields = ['id', 'workOrder', 'quantity','custom_product_name', 'mfgnum','custom_product_description', 'number']
 
 class workOrderItemNumberSerializer(serializers.ModelSerializer):
     class Meta:

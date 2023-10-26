@@ -1,8 +1,8 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<h1>Generate your Work Order</h1>
-<h1>{{user}}</h1>
+<h1>Create Take Back Sheet</h1>
+
 <div class="row">
     <div class="col-2"></div>
     <div class="col-md-8">
@@ -29,7 +29,7 @@
                         <td>{{ i.name }}</td>
                         <td>
                             <input type="hidden" name="client" value="{{ i.id }}">
-                            <button type="submit">Create Work Order</button>
+                            <button type="submit">Create Take Back Sheet</button>
                         </td>
                     </form>
                 </tr>

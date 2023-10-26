@@ -2,17 +2,19 @@
 
 {% block content %}
 <div class="row">
-    <h1>Past Work Orders</h1>
+    <h1>Past Take Back Sheets</h1>
 </div>
 
 <div class="row">
     <table class="table">
         <thead>
           <tr>
-            <th>Work Order Number</th>
+            <th>Take Back Sheet Number</th>
             <th>Client</th>
             <th>Issue Date</th>
+            <th>Color</th>
             <th>Status</th>
+            <th>View</th>
             <th>Actions</th> 
              
           </tr>
@@ -24,7 +26,15 @@
               <td>{{ workOrder.workOrder_num }}</td>
               <td>{{ workOrder.client }}</td>
               <td>{{ workOrder.workOrder_date }}</td>
-              <td>{{ workOrder.status }}</td>
+              <td>
+                {{ workOrder.color }}
+                <div style="width: 15px; height: 15px; display: inline-block; background-color: {{ workOrder.color }};"></div>
+                
+              </td>
+              <td>{{ workOrder.get_status_display }}</td>
+              <td>
+                <a href="{% url 'invoice:workOrderView' workOrder %}">view</a>
+              </td>
               <td>
                 <!-- Add a link or button to open the editInvoice view with a confirmation pop-up -->
                 <a href="{% url 'invoice:addItemsWorkOrder' workOrder.workOrder_num %}" onclick="return confirm('Are you sure you want to edit?')">Edit</a>
@@ -33,7 +43,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="4">No Work Orders available.</td>
+              <td colspan="4">No Take Back Sheets available.</td>
             </tr>
           {% endfor %}
         </tbody>

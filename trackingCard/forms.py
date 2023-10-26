@@ -7,6 +7,10 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
+
+
+
+
 class WorkOrderForm(forms.Form):
     client = forms.ModelChoiceField(queryset=Client.objects.all(), empty_label=None)
     
@@ -18,12 +22,56 @@ class WorkOrderItemForm(forms.Form):
         queryset=Product.objects.all(),
         empty_label="Select a Product",
         label="Product"
+
     )
     description = forms.CharField(max_length=200, label="Description")
+    quantity = forms.IntegerField(min_value=1)
+    mfgnum = forms.CharField(max_length=50, label="Description")
     
 
-
 WorkOrderItemFormSet = formset_factory(WorkOrderItemForm, extra=1)
+
+class WorkOrderViewForm(forms.Form):
+    STATUS_CHOICES = [
+        ('Waiting_on_Assignment', 'Waiting on Assignment'),
+        ('Checked_Out', 'Checked Out'),
+        ('Needs_QC', 'Needs QC'),
+        ('Parts_On_Order', 'Parts On Order'),
+        ('QC_PASS', 'QC PASS'),
+        ('QC_FAIL', 'QC FAIL'),
+    ]
+
+    QC_STATUS_CHOICES = [
+        ('QC_FAIL', 'QC FAIL'),
+        ('QC_PASS', 'QC PASS'),
+        ('WAITING_QC', 'Waiting On QC'),
+        ('NO_QC', ' ')
+    ]
+    status = forms.ChoiceField(
+        choices=STATUS_CHOICES,
+        label='Status',
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False  # Make the field optional
+    )
+    technician = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        to_field_name='id',
+        empty_label='Select a Technician',
+        label='Technician',
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False  # Make the field optional
+    )
+    qc = forms.ChoiceField(
+        choices=QC_STATUS_CHOICES,
+        label='QC',
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False  # Make the field optional
+    )
+    item_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+
+    
+
+WorkOrderViewFormSet = formset_factory(WorkOrderViewForm, extra=1)
 
 class WorkOrderItemFormEdit(forms.ModelForm):
     class Meta:
@@ -31,16 +79,26 @@ class WorkOrderItemFormEdit(forms.ModelForm):
         fields = ['product', 'quantity']
 
 
+
+
 class WorkOrderItemOtherForm(forms.ModelForm):
+    mfgnum = forms.CharField(max_length=15, widget=forms.TextInput(attrs={'maxlength': '15'}), label="Manufacturer Label") 
+    custom_product_name = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'maxlength': '25'}), label="Name")
+    quantity = forms.IntegerField(min_value=1)
+    custom_product_description = forms.CharField(label="Description",max_length=70,required=False,
+                                                 widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}))
+
+
     class Meta:
         model = WorkOrderItem
-        fields = ['workOrder', 'product', 'custom_product_name', 'custom_product_description', 'number']
+        fields = ['workOrder', 'product', 'quantity', 'mfgnum', 'custom_product_name', 'custom_product_description', 'number']
         widgets = {
             'workOrder': forms.HiddenInput(),
             'product': forms.HiddenInput(),
             'number': forms.HiddenInput(),
         }
-    
+
+    # ... rest of your form ...
 
     def clean_custom_product_description(self):
         description = self.cleaned_data.get('custom_product_description')
@@ -53,13 +111,22 @@ class WorkOrderItemOtherForm(forms.ModelForm):
 
 
 class WorkOrderEnrichmentForm(forms.Form):
-    is_rush = forms.BooleanField(required=False)
+    is_rush = forms.BooleanField(required=False, label="RUSH?  ")
     return_by = forms.DateField(
     required=False,
-    widget=forms.DateInput(attrs={'class': 'form-control datepicker', 'style': 'width: 125px;'})
-)
-    quote_required = forms.BooleanField(required=False)
-    specialInstructions = forms.CharField(max_length=250, required=False)
+    widget=forms.DateInput(attrs={'class': 'form-control datepicker','autocomplete': 'off'}), label="RETURN BY:")
+    quote_required = forms.BooleanField(required=False, label="QUOTE? ")
+    specialInstructions = forms.CharField(
+        max_length=250,
+        required=False,
+        label="SPECIAL INSTRUCTIONS",
+        widget=forms.Textarea(attrs={'rows': 1, 'cols': 40})  # Add Textarea widget
+    )
+
+class WorkOrderItemDelete(forms.ModelForm):
+    class Meta:
+        model = WorkOrderItem
+        fields = ['id']
 
 class WorkOrderItemFormEdit(forms.ModelForm):
     class Meta:
