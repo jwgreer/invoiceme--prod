@@ -257,7 +257,7 @@ let crsfToken = '{% csrf_token %}';
     $(document).ready(function() {
         // Get the CSRF token from the template
         var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
-        var apiUrl = site_url + 'workOrder/api/workOrderEnrichment/';
+        var apiUrl = site_url + '/workOrder/api/workOrderEnrichment/';
         var workOrder_id = "{{workOrder_id}}"
     
         // Attach a change event listener to the "is_rush" checkbox

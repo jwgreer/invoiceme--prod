@@ -75,7 +75,7 @@
 $(document).ready(function() {
     // Get the CSRF token from the template
     var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
-    var apiUrl = site_url +'workOrder/api/workOrderView/';
+    var apiUrl = site_url +'/workOrder/api/workOrderView/';
 
     // Attach a change event listener to the "technician" dropdown
     $('select[name="technician"]').on('change', function() {
