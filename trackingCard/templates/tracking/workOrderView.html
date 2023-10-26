@@ -67,13 +67,15 @@
 </div>
 
 
-
+<script>
+    let site_url = '{{ site_url }}';
+</script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
     // Get the CSRF token from the template
     var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
-    var apiUrl = 'http://127.0.0.1:8000/workOrder/api/workOrderView/';
+    var apiUrl = site_url +'workOrder/api/workOrderView/';
 
     // Attach a change event listener to the "technician" dropdown
     $('select[name="technician"]').on('change', function() {

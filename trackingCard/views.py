@@ -157,7 +157,7 @@ def workOrderColorAPI(request, workOrder_id):
     try:
         color = work_order2.color
     except WorkOrders.DoesNotExist:
-        color = None
+        color = "red"
 
     color_list = [
         "red","black", "green", "blue", "yellow", "orange","aqua", "pink","lightred", "brown", "beige",
@@ -618,11 +618,11 @@ def workOrderItemOther(request, id):
 def shopWorkDashboard(request):
     context = {}
     return render(request, 'tracking/shopWorkDashboard.html', context)
-
+@login_required(login_url='invoice:loginPage')
 def workOrderView(request, workOrder):
     workOrder_ = WorkOrders.objects.get(pk=workOrder)
     workOrderItems = WorkOrderItem.objects.filter(workOrder=workOrder)
-    print(workOrderItems)
+    site_url = settings.SITE_URL
 
     initial_list = []
     for i in workOrderItems:
@@ -669,7 +669,8 @@ def workOrderView(request, workOrder):
         'workOrderItems': workOrderItems,
         'workOrder_id': workOrder,
         'formset': formset,
-        'form': form 
+        'form': form,
+        'site_url': site_url
     }
 
     return render(request, 'tracking/workOrderView.html', context)
@@ -1008,10 +1009,14 @@ def pdfTracker(request, workOrder_id):
         item_mfg_arr.append(item.mfgnum)
         
         if item.product.product_type == 2:
+            if item.custom_product_description is None:
+                item.custom_product_description = ''
             item_desc_arr.append(item.custom_product_description)
             item_arr.append(item.custom_product_name)
             
         else:
+            if item.description is None:
+                item.description = ''
             item_desc_arr.append(item.description)
             item_arr.append(item.product.name)
 
