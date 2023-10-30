@@ -13,9 +13,9 @@ class ClientFilter(django_filters.FilterSet):
         fields = ['name']
 
 class ProductsFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(field_name='name', lookup_expr='icontains', label='Instrument Name')
+    name = django_filters.CharFilter(field_name='name', lookup_expr='icontains', label='Inst. Name')
     product_type = django_filters.ModelChoiceFilter(
-        field_name='product_type', queryset=ProductType.objects.exclude(name="Other"), label='Instrument Type' # exclude the other option
+        field_name='product_type', queryset=ProductType.objects.exclude(name="Other"), label='Inst. Type' # exclude the other option
         #field_name='product_type', queryset=ProductType.objects.all(), label='Product Type'
     )
 

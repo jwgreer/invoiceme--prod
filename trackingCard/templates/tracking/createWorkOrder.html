@@ -10,7 +10,7 @@
             <div class="card card-body">
                 <form method="get" action="{% url 'invoice:createWorkOrder' %}" id="filter-form">
                     {{ clientFilter.form }}
-                    <button class="btn btn-primary" type="submit">Search</button>
+                    <button class="btn btn-secondary" type="submit">Search</button>
                     <a class="btn btn-warning" href="{% url 'invoice:createWorkOrder' %}">Reset</a>
                 </form>
             </div>

@@ -9,7 +9,6 @@
 }
 
 
-
 </style>
 
 
@@ -31,62 +30,77 @@
         </div>
     </div>
 </div>
+<style>
+    .bordered-col {
+        border: 1px solid #000; /* Add your preferred border style here */
+        padding: 10px; /* Optional: Add some padding to the columns for spacing */
+    }
 
-<div>
-    <form method="post" id="workOrderViewForm">
-        {% csrf_token %}
-        <div class="row" style="margin-top: 15px;">
-            <div class="col card">
-                <label>
-                    <div id="is_rush_d" class="col">Rush</div>
-                    <div class="col">{{workOrderForm.is_rush}}</div>
-                </label>
+    
+</style>
+
+<!--
+    <div class="row">
+        
+        <div class="col-lg-4  bordered-col">
+        </div>
+        <div class="col bordered-col">
+        </div>
+        <div class="col bordered-col">
+
+        </div>
+        <div class="col bordered-col">
+        </div>
+        <div class="col-lg-6 bordered-col">
+        </div>
+    
+    </div>
+ -->
+
+
+<form method="post" id="workOrderViewForm">
+    {% csrf_token %}
+    <div class="row">
+            <div class="col-lg-2 card">
+                <div id="is_rush_d">Rush</div>
+                {{workOrderForm.is_rush}}
             </div>
-            <div class="col-2 card">
-                <lable>
-                    <div id="quote_required_d">Quote Required</div>
-                    {{workOrderForm.quote_required}}
-                </lable>                   
+            <div class="col-lg-2 card">
+                <div id="quote_required_d">Quote Required</div>
+                {{workOrderForm.quote_required}}
             </div>
-            <div class="col-md-6 card" >
-                    <div id="specialInstructions_d">Instructions - {{workOrder.specialInstructions}}</div>
-                    <input type="text" id="specialInstructions" name="specialInstructions">
+            <div class="col-lg-6 card">
+                <div id="specialInstructions_d">Instructions - {{workOrder.specialInstructions}}</div>
+                <input type="text" id="specialInstructions" name="specialInstructions" maxlength="200">
             </div>
-            <div class="col card">
+            <div class="col-lg-2 card">
                 <div id="return_by_d">Return By</div>
                 {{workOrderForm.return_by}}
             </div>
-        </div>
-    </form>
+    </div>
+
+</form>
+
 
     
 
-    <div class="row" style="margin: 15px 0px 0px 15px; padding-bottom: 10px;">
-        <div class="col-6">
-            <div class="row">
-                <div class="col-5">
-                    <a href="{% url 'invoice:pdfTracker' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Blue Card PDF</a>                 
-                </div>
-                <div class="col-6">
-                    <a href="{% url 'invoice:pdfCustomerTracking' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Take Back Sheet PDF</a>
-                </div>
-            </div>
+<div class="row" style="margin: 15px 0px 0px 15px; padding-bottom: 10px;">
+        <div class="col-md-5">
+                <span>
+                   <span><a href="{% url 'invoice:pdfTracker' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Blue Card PDF</a> </span>  
+                   <span><a href="{% url 'invoice:pdfCustomerTracking' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Take Back Sheet PDF</a></span>              
+                </span>
         </div>    
-        <div class="col-6">
-            <div class="row">
-                <div class="col-8">
-                    <a href="{% url 'invoice:customWorkOrderItem' workOrder_id %}">
-                        <button class="btn btn-warning">Add Instrument Not Listed</button>
-                    </a>
-                </div>
-                <div class="col-4">
-                    <a href="{% url 'invoice:signature_page' workOrder_id %}" target="_blank" class="btn btn-primary">Sign Take Back Sheet</a>          
-                </div>
-            </div>
+        <div class="col-md-5">
+            <span><a href="{% url 'invoice:customWorkOrderItem' workOrder_id %}"><button class="btn btn-success">Add Instrument Not Listed</button></a></span>       
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'invoice:signature_page' workOrder_id %}" target="_blank" class="btn btn-primary">Sign Take Back Sheet</a> 
         </div>
     </div>
-    <div class="row" style="min-height: 600px;" id="test">
-        <div class="col-md-4 card card-body" id="table-container-item">
+    <div class="row" id="test">
+        <div class="col-lg-4 card card-body" id="table-container-item">
+            <span>
             <table class="table" id="item-table">
                 <thead>
                     <tr>
@@ -117,14 +131,15 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </span>
         </div>
 
-        <div class="col-md-8 ">            
+        <div class="col-lg-8 ">        
             <div>            
                 <div class="card card-body" style="margin-bottom: 15px;">
                     <form method="get">
                         {{myFilter.form.as_table}}
-                        <button class="btn btn-primary">Search</button>
+                        <button class="btn btn-secondary">Search</button>
                         <a class="btn btn-warning" href="{% url 'invoice:addItemsWorkOrder' workOrder_id %}">Reset</a>
                     </form>
                 </div>
@@ -150,16 +165,16 @@
                         {% csrf_token %}
                         <table class="table" id="test2">
                             <tr>
-                                <th>Instrument Type</th>
+                                <th>Inst. Name</th>
                                 <th>Quantity</th>
-                                <th>Manufacter #</th>
-                                <th>Description</th>
-                                <th>Issue W/ Instrument</th>
-                                <th>Add Instrument</th>
+                                <th>MFG #</th>
+                                <th>Inst. Description</th>
+                                <th>Issue W/ Inst.</th>
+                                <th>Add Inst.</th>
                             </tr>
                             {% for i in products %}
                                 <tr>
-                                    <td>{{ i.product_type }}</td>
+                                    <td>{{ i.name }}</td>
                                     <td>
                                         <input class="quantity" style="width: 50px;" type="number" name="quantity" value="" min="1">
                                         <div class="tooltip">Please enter a valid number</div>
@@ -168,7 +183,6 @@
                                     <td>
                                         <input class="mfgnum" style="width: 100px;" type="text" name="mfgnum" maxlength="12" value="">
                                     </td>
-                                    
                                     <td>
                                         <textarea class="description" style="height: 75px; word-wrap: break-word;" name="description" maxlength="30"></textarea>
                                     </td>
