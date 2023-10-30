@@ -210,18 +210,19 @@ def workOrderColorAPI(request, workOrder_id):
         work_order = WorkOrders.objects.get(pk=workOrder_id)
     except WorkOrders.DoesNotExist:
         return Response({'message': 'Work order not found.'}, status=status.HTTP_404_NOT_FOUND)
-
     try:
         # Retrieve the second most recent work order
         work_order2 = WorkOrders.objects.all().order_by('-created_at')[1]
-        serializer = workOrderColorSerializer(work_order2)
-    except WorkOrders.DoesNotExist:
-        return Response({'message': 'Not enough work orders to retrieve the second most recent.'}, status=status.HTTP_404_NOT_FOUND)
-
+    except:
+        pass
+   
     try:
+        serializer = workOrderColorSerializer(work_order2)
         color = work_order2.color
-    except WorkOrders.DoesNotExist:
-        color = "red"
+    except:
+        color = None
+        pass
+
 
     # 35 total colors
     color_list = [
@@ -234,11 +235,11 @@ def workOrderColorAPI(request, workOrder_id):
 
     if color is None:
         color = color_list[0]
-        try:
-            work_order.color = color
-            work_order.save()
-        except:
-            pass
+        work_order.color = color
+        work_order.save()
+        serializer = workOrderColorSerializer(work_order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     elif color not in color_list:
         color = "red"  # Use the first color if there's no second recent work order
     else:
