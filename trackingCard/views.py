@@ -926,7 +926,10 @@ def pdfCustomerTracking(request, workOrder_id):
     p.drawString(3.8*inch, 3.8*inch, "7. TODAYS DATE")
     if signature:
         signature_image_path = signature.image.path
-        p.drawImage(signature_image_path, 0.2*inch, 2.0*inch, width=100, height=45, mask='auto')
+        p.saveState()
+        p.scale(1, -1)  
+        p.drawImage(signature_image_path, 0.3 *inch,-2.6*inch, width=125, height=45, mask='auto')
+        p.restoreState()
     else:
         pass
 
