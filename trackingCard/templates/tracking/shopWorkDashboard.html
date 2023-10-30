@@ -4,5 +4,72 @@
 
 <h1>Shop Work Dashboard</h1>
 
+<div class="row">
+    <div class="col-2 card card-body">
+        <div>Rush Take Backs</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Due Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rush_workOrders %}
+                    <tr>
+                        <td><a href="{% url 'invoice:workOrderView' r.workOrder_num %}">{{ r.client }}</a></td>
+                        <td>{{ r.return_by }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-2 card card-body">
+        <div>Take Backs Due Next</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Due Date</th>
+                    <th>Account</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for workOrder in latest_workOrders %}
+                    <tr>
+                        <td>{{ workOrder.return_by }}</td>
+                        
+                        <td><a href="{% url 'invoice:workOrderView' workOrder.workOrder_num %}">{{ workOrder.client }} </a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-2 card card-body">
+        <div>Instruments Waiting on Parts</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Account</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in instruments_waiting_on_parts %}
+                    <tr>
+                        <td>
+                            {% if i.product.id == 2 %}
+                                <a href="{% url 'invoice:workOrderView' i.workOrder %}">{{ i.custom_product_name }}</a>
+                            {% else %}
+                                <a href="{% url 'invoice:workOrderView' i.workOrder %}">{{ i.product.name }}</a>
+                            {% endif %}
+                        </td>
+                        <td>{{ i.workOrder.client }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
 
 {% endblock content %}

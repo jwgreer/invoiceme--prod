@@ -20,8 +20,8 @@ class WorkOrderForm(forms.Form):
 class WorkOrderItemForm(forms.Form):
     product = forms.ModelChoiceField(
         queryset=Product.objects.all(),
-        empty_label="Select a Product",
-        label="Product"
+        empty_label="Select an Instrument",
+        label="Instrument"
 
     )
     description = forms.CharField(max_length=200, label="Description")
@@ -82,10 +82,10 @@ class WorkOrderItemFormEdit(forms.ModelForm):
 
 
 class WorkOrderItemOtherForm(forms.ModelForm):
-    mfgnum = forms.CharField(max_length=15, widget=forms.TextInput(attrs={'maxlength': '15'}), label="Manufacturer Label") 
-    custom_product_name = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'maxlength': '25'}), label="Name")
+    mfgnum = forms.CharField(max_length=15, widget=forms.TextInput(attrs={'maxlength': '12'}), label="Manufacturer #") 
+    custom_product_name = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'maxlength': '20'}), label="Name")
     quantity = forms.IntegerField(min_value=1)
-    custom_product_description = forms.CharField(label="Description",max_length=70,required=False,
+    custom_product_description = forms.CharField(label="Description",max_length=40,required=False,
                                                  widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}))
 
 
@@ -133,9 +133,7 @@ class WorkOrderItemFormEdit(forms.ModelForm):
         model = WorkOrderItem
         fields = ['product']
 
-'''
-# Add fields for custom product
-custom_product_name = models.CharField(max_length=200, blank=True, null=True)
-custom_product_description = models.TextField(blank=True, null=True)
-custom_product_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-'''
+class SignatureForm(forms.ModelForm):
+    class Meta:
+        model = Signature
+        fields = ['image']

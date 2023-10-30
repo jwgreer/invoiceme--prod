@@ -10,6 +10,7 @@ admin.site.register(ProductType)
 admin.site.register(Discount)
 admin.site.register(Tax)
 admin.site.register(WorkOrders)
+admin.site.register(Signature)
 #admin.site.register(WorkOrderItem)
 
 @admin.register(WorkOrderItem)

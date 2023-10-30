@@ -4,7 +4,6 @@
 <div class="row">
     <h1>Past Take Back Sheets</h1>
 </div>
-
 <div class="row">
     <table class="table">
         <thead>
@@ -15,12 +14,10 @@
             <th>Color</th>
             <th>Status</th>
             <th>View</th>
-            <th>Actions</th> 
-             
+            <th>Actions</th>          
           </tr>
         </thead>
-        <tbody>
-        
+        <tbody>       
           {% for workOrder in workOrders %}
             <tr>
               <td>{{ workOrder.workOrder_num }}</td>
@@ -28,16 +25,14 @@
               <td>{{ workOrder.workOrder_date }}</td>
               <td>
                 {{ workOrder.color }}
-                <div style="width: 15px; height: 15px; display: inline-block; background-color: {{ workOrder.color }};"></div>
-                
+                <div style="width: 15px; height: 15px; display: inline-block; background-color: {{ workOrder.color }};"></div>              
               </td>
               <td>{{ workOrder.get_status_display }}</td>
               <td>
                 <a href="{% url 'invoice:workOrderView' workOrder %}">view</a>
               </td>
               <td>
-                <!-- Add a link or button to open the editInvoice view with a confirmation pop-up -->
-                <a href="{% url 'invoice:addItemsWorkOrder' workOrder.workOrder_num %}" onclick="return confirm('Are you sure you want to edit?')">Edit</a>
+                <a href="{% url 'invoice:addItemsWorkOrder' workOrder.workOrder_num %}" >Edit</a>
               </td>
               </td>
             </tr>
@@ -53,19 +48,16 @@
           {% if workOrders.has_next %}
             <a href="?page={{ workOrders.paginator.num_pages }}">last</a>
             <a href="?page={{ workOrders.next_page_number }}">next</a>
-          {% endif %}
-        
+          {% endif %}       
           <span class="current-page">
             Page {{ workOrders.number }} of {{ workOrders.paginator.num_pages }}.
-          </span>
-        
+          </span>       
           {% if workOrders.has_previous %}
             <a href="?page={{ workOrders.previous_page_number }}">previous</a>
             <a href="?page=1">first</a>
           {% endif %}
         </span>
       </div>
-
 </div>
 
 {% endblock %}

@@ -2,13 +2,13 @@
 
 {% block content %}
 
-<h1>Edit Product</h1>
+<h1>Edit nstrument</h1>
 
 <form id="workOrderForm">
     {% csrf_token %}
-    <label for="product">Select Product:</label>
+    <label for="product">Select Instrument:</label>
     <select name="product" id="product">
-        <option value="">Select a product</option>
+        <option value="">Select an Instrument</option>
         {% for product in products %}
             <option value="{{ product.id }}">{{ product.name }}</option>
         {% endfor %}
@@ -16,7 +16,7 @@
     <label for="quantity">Quantity:</label>
     <input type="number" id="quantity" name="quantity" required min="1"><br>
     
-    <button type="submit">Submit Item</button>
+    <button type="submit">Submit Change</button>
 
 </form>
 

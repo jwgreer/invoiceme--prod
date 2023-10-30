@@ -173,6 +173,8 @@ STATIC_ROOT= BASE_DIR / 'static'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
+IMAGE_PROCESSING_BACKEND = 'pillow'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

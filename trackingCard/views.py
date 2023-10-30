@@ -1,14 +1,17 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user
 from django.contrib.auth.decorators import login_required
 import io
 from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, landscape
-from django.http import HttpResponse, JsonResponse
-from invoice.models import *
 from reportlab.lib import colors
+from reportlab.graphics import renderSVG
+from reportlab.platypus import SimpleDocTemplate, Image
+from reportlab.lib.utils import ImageReader
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
+from invoice.models import *
 from invoice.filters import ClientFilter, ProductsFilter
 from .forms import *
 from .serializers import *
@@ -16,13 +19,68 @@ from datetime import date, datetime, timedelta
 from django.conf import settings
 import requests
 import json
-from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.paginator import Paginator, Page
-from django.contrib.auth import get_user
 from django.forms import inlineformset_factory
+from PIL import Image
+import os
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.shortcuts import get_object_or_404
+
+
+
+@api_view(['POST'])
+def addItemTestAPI(request):
+    if request.method == "POST":
+        try:
+            d = request.data.get('data', {})
+            quantity = int(d["quantity"]) 
+            workOrder_id = d.get('workOrder', None)  # Use get with a default value to avoid KeyError
+        except (KeyError, ValueError) as e:
+            # Handle the exception by returning an error response
+            error_message = "Invalid request data: " + str(e)
+            return Response("PLEASE ENTER A VALID NUMBER", status=status.HTTP_400_BAD_REQUEST)
+
+        if d['product'] in ["3", "4"]:
+            print("test")
+            i = 0
+            
+            if quantity > 1:
+                created_items = []
+                while i < quantity:
+                    # Create a new dictionary to avoid modifying the original data
+                    d['quantity'] = "1"
+                    d['number'] = str(WorkOrderItem.objects.filter(workOrder=workOrder_id).count() + 1)
+                    serializer = workOrderItemSerializer(data=d)
+
+                    if serializer.is_valid():
+                        serializer.save()
+                        created_items.append(serializer.data)
+                        print(i)
+                        i += 1
+                return Response(created_items, status=status.HTTP_201_CREATED)
+            
+            # Quantity is not greater than 1, handle it as a single item
+            serializer = workOrderItemSerializer(data=d)
+            d['number'] = str(WorkOrderItem.objects.filter(workOrder=workOrder_id).count() + 1)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            
+            d['number'] = str(WorkOrderItem.objects.filter(workOrder=workOrder_id).count() + 1)
+            print(d['issue'])
+            # If the product is not "3" or "4", handle it as a single item
+            serializer = workOrderItemSerializer(data=d)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def workOrderEnrichment(request):
@@ -42,17 +100,17 @@ def workOrderEnrichment(request):
         if type == 'is_rush':
             try:
                 workOrder.is_rush = value
+                workOrder.status = 'Rush'
                 workOrder.save()
                 return Response(status=status.HTTP_200_OK)
             except:
-
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         elif type == "return_by":
             try:
                 workOrder.return_by = value
+
                 workOrder.save()
                 return Response(status=status.HTTP_200_OK)
-
             except:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         elif type == "quote_required":
@@ -61,7 +119,6 @@ def workOrderEnrichment(request):
                 workOrder.save()
                 return Response(status=status.HTTP_200_OK)
             except:
-
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             
         elif type == "specialInstructions":
@@ -70,29 +127,34 @@ def workOrderEnrichment(request):
                 workOrder.save()
                 return Response(status=status.HTTP_200_OK)
             except:
-
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-            
-
         
+        
+            
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @api_view(['POST'])
 def workOrderViewAPI(request):
+    
     if request.method == 'POST':
         
-        # Access the data from the request body
         data = request.data
         type = data.get('type', '')
         value = data.get('value', '')
-        print(value)
+        
         if value is None:
             return
         id = data.get('id', '')
-        
-        item = WorkOrderItem.objects.get(pk=id)
+        try:
+            item = WorkOrderItem.objects.get(pk=id)
+        except: 
+            pass
+
+        print(type)
         if type == 'technician':
             if value == 'none':
                 print("none")
@@ -126,16 +188,18 @@ def workOrderViewAPI(request):
                 item.save()
                 return Response(status=status.HTTP_200_OK)
 
-
-
-
-
             item.qc = value
             item.save()
             return Response(status=status.HTTP_200_OK)
-
-
-        # Process the data as needed
+        elif type == 'workOrderStatus':
+            try:
+                workOrder = WorkOrders.objects.get(pk=id)
+                workOrder.status = value
+                workOrder.save()
+                return Response(status=status.HTTP_200_OK)
+            except:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_200_OK)
 
         return Response({'message': 'Data received and processed successfully'})
 
@@ -159,8 +223,9 @@ def workOrderColorAPI(request, workOrder_id):
     except WorkOrders.DoesNotExist:
         color = "red"
 
+    # 35 total colors
     color_list = [
-        "red","black", "green", "blue", "yellow", "orange","aqua", "pink","lightred", "brown", "beige",
+        "red","black", "green", "blue", "yellow", "orange","aqua", "pink", "brown", "beige",
         "bisque", "chocolate", "darkblue", "darkred","dodgerblue", "darkgreen", "darkorange",
         "darkgrey", "gold", "grey", "hotpink", "indigo", "lawngreen",
          "lightblue","burlywood","crimson", "magenta", "maroon", "navy", "olive", "salmon",
@@ -295,6 +360,7 @@ def itemWorkOrderAPI(request, workOrder_id):
 
     elif request.method == "POST":
         d = request.data
+        print(d)
         i = 0
         quantity = int(d["quantity"])  # Use get with a default value to avoid KeyError
 
@@ -325,6 +391,7 @@ def itemWorkOrderAPI(request, workOrder_id):
         else:
             
             d['number'] = str(WorkOrderItem.objects.filter(workOrder=workOrder_id).count() + 1)
+            print(d['issue'])
             # If the product is not "3" or "4", handle it as a single item
             serializer = workOrderItemSerializer(data=d)
 
@@ -414,7 +481,7 @@ def editWorkOrderItem(request, workOrder_id, id):
         'products': products,
         'site_url': site_url,
     }
-    return render(request, 'invoice/editItemForm.html', context)
+    return render(request, 'tracking/editWorkOrderItemForm.html', context)
 
 @login_required(login_url='invoice:loginPage')
 def createWorkOrder(request):
@@ -534,6 +601,11 @@ def addItemsWorkOrder(request, workOrder_id):
 
     
     workOrder = WorkOrders.objects.get(pk=workOrder_id)
+
+    if (not request.user.groups.filter(name='admin')) and workOrder.status != "Waiting_on_Assignment":
+        s = workOrder.status
+        return HttpResponseForbidden(f"The current status is '{s}'. Only admin can view this page.")
+    
     deleteForm = WorkOrderItemDelete(request.POST)
     workOrderItems = WorkOrderItem.objects.filter(workOrder=workOrder_id)
     workOrder_id = WorkOrders.objects.get(pk=workOrder_id)
@@ -616,12 +688,23 @@ def workOrderItemOther(request, id):
 
 @login_required(login_url='invoice:loginPage')
 def shopWorkDashboard(request):
-    context = {}
+
+    latest_workOrders = WorkOrders.objects.order_by('-created_at')[:5]
+    rush_workOrders = WorkOrders.objects.filter(status='Rush')
+    instruments_waiting_on_parts = WorkOrderItem.objects.filter(status="Parts_On_Order")
+
+    context = {
+        'latest_workOrders': latest_workOrders,
+        'instruments_waiting_on_parts': instruments_waiting_on_parts,
+        'rush_workOrders': rush_workOrders
+    }
+
     return render(request, 'tracking/shopWorkDashboard.html', context)
 @login_required(login_url='invoice:loginPage')
 def workOrderView(request, workOrder):
     workOrder_ = WorkOrders.objects.get(pk=workOrder)
     workOrderItems = WorkOrderItem.objects.filter(workOrder=workOrder)
+    choices = [choice[1] for choice in WorkOrders.STATUS_CHOICES]
     site_url = settings.SITE_URL
 
     initial_list = []
@@ -670,18 +753,58 @@ def workOrderView(request, workOrder):
         'workOrder_id': workOrder,
         'formset': formset,
         'form': form,
-        'site_url': site_url
+        'site_url': site_url,
+        'choices': choices
     }
 
     return render(request, 'tracking/workOrderView.html', context)
 
 @login_required(login_url='invoice:loginPage')
+def signature_page(request, workOrder_id):
+    workOrder_ = WorkOrders.objects.get(pk=workOrder_id)
+    context = {
+        'workOrder': workOrder_,
+        'workOrder_id': workOrder_id
+    }
+    return render(request, 'tracking/draw_signature.html', context)
+
+@api_view(['POST'])
+def signatureAPI(request):
+    try:
+        print(request.data)
+        image = request.data.get('image', '')  # Get the image data from the request
+        workOrder_id = int(request.data.get('workOrder_id',''))
+
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    if request.method == "POST":
+        try:
+            # Get the WorkOrder instance (replace this with your logic to fetch the correct WorkOrder)
+            work_order = WorkOrders.objects.get(pk=workOrder_id)  # Replace with the actual ID or lookup criteria
+
+
+            # Create and save the Signature instance with the associated WorkOrder
+            signature = Signature(image=image, workOrder=work_order)
+            signature.save()
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@xframe_options_exempt
+@login_required(login_url='invoice:loginPage')
 def pdfCustomerTracking(request, workOrder_id):
     workOrder = WorkOrders.objects.get(pk=workOrder_id)
-    contacts = ClientContact.objects.get(client = workOrder.client)
-    primaryContact = ClientContact.objects.get(client=workOrder.client, status='Primary')
-    primaryContact = f"{primaryContact.first_name} {primaryContact.last_name}"
     c = workOrder.color
+
+    if c is None or c == "":
+        c = "red"
+    
+    logo = 'static/img/simnarLogo.png'
+
 
     showpg = False
 
@@ -693,6 +816,11 @@ def pdfCustomerTracking(request, workOrder_id):
         # Handle the case when the user with the given username doesn't exist
         created_by = ""
     
+
+    try:
+        signature = Signature.objects.filter(workOrder=workOrder_id).latest('created_at')
+    except:
+        signature = None
 
     items = WorkOrderItem.objects.filter(workOrder=workOrder)
 
@@ -790,8 +918,12 @@ def pdfCustomerTracking(request, workOrder_id):
     p.drawString(-.6*inch, 3.8*inch, "5. Items")
     p.drawString(.6*inch, 3.8*inch, "6. RETURN BY")
     p.drawString(3.8*inch, 3.8*inch, "7. TODAYS DATE")
-    p.drawString(-0.2*inch, 2.5*inch, primaryContact)
-    p.drawString(-0.2*inch, 3.1*inch, created_by)
+    if signature:
+        signature_image_path = signature.image.path
+        p.drawImage(signature_image_path, 0.2*inch, 2.0*inch, width=100, height=45, mask='auto')
+    else:
+        pass
+
 
 
     p.setFont("Helvetica", 10)
@@ -809,7 +941,10 @@ def pdfCustomerTracking(request, workOrder_id):
         p.drawString(6.1*inch, 1.2*inch, "NO")
     p.drawString(5.8*inch, -.3*inch, "Tracking ID #: ")
     p.drawString(6.9*inch, -.3*inch, str(workOrder.pk))
-    p.drawString(-0.3*inch, -.3*inch, "Simnar Logo")
+    p.saveState()
+    p.scale(1,-1)
+    p.drawImage(logo, -.7 * inch, .1 * inch, width=100, height=50, mask='auto')
+    p.restoreState()
     p.drawString(2.45*inch, 1.25*inch, "Group Decal")
 
     p.drawString(2.2*inch, 1.4*inch, "Color Id: " + c)
@@ -859,7 +994,6 @@ def pdfCustomerTracking(request, workOrder_id):
 
     x3 = 4.75
 
-    print(len(items))
     for i in items:
 
         if i.product.id  == 2:
@@ -884,7 +1018,7 @@ def pdfCustomerTracking(request, workOrder_id):
             p.drawString(-.65*inch, x3*inch, i.number)
             p.drawString(-.2*inch, x3*inch, str(i.quantity))
             p.drawString(.3*inch, x3*inch, i.mfgnum)
-            p.setFont("Helvetica", 8)
+            p.setFont("Helvetica", 12)
             p.drawString(1.55*inch, x3*inch, name + " - " + description) 
             p.setFont("Helvetica", 10)
             p.drawString(6.38*inch, x3*inch, "Needs Repair")
@@ -971,8 +1105,14 @@ def pdfCustomerTracking(request, workOrder_id):
     # FileResponse sets the Content-Disposition header so that browsers
     # present the option to save the file.
     buffer.seek(0)
-    response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename="invoice.pdf"'
+    #response = HttpResponse(buffer, content_type='application/pdf')
+    #response['Content-Disposition'] = 'inline; filename="invoice.pdf"'
+    #buffer.seek(0)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=reportlab.pdf'
+    response.write(buffer.read())
+    buffer.close()
 
     return response
 
@@ -980,25 +1120,45 @@ def pdfCustomerTracking(request, workOrder_id):
 
 @login_required(login_url='invoice:loginPage')
 def pdfTracker(request, workOrder_id):
-    workOrder = WorkOrders.objects.get(pk=workOrder_id)
-    items = WorkOrderItem.objects.filter(workOrder=workOrder)
-    primaryContact = ClientContact.objects.get(client=workOrder.client, status='Primary')
-    primaryContact = f"{primaryContact.first_name} {primaryContact.last_name}"
-    c = workOrder.color
+    try:
+        workOrder = WorkOrders.objects.get(pk=workOrder_id)
+    except:
+        workOrder = ""
+
+    try:
+        items = WorkOrderItem.objects.filter(workOrder=workOrder)
+    except:
+        items = ""
+
+    try:
+        primaryContact = ClientContact.objects.get(client=workOrder.client, status='Primary')
+        primaryContact = f"{primaryContact.first_name} {primaryContact.last_name}"
+    except:
+        primaryContact = ""
+    
+    try:
+        c = workOrder.color
+        if c == None or c == "":
+            c = "red"
+    except:
+
+        c = "red"
+    
+    
+    logoPNG = 'static/img/simnarLogo.png'
     item_arr = []
     item_number_arr = []
     item_mfg_arr = []
     item_qty_arr = []
     item_type_arr = []
-    item_desc_arr = []
+    item_issue_arr = []
     counter = 0
 
     try:
         user = User.objects.get(username=workOrder.created_by)
         recievingTech = f"{user.first_name[0]} {user.last_name[0]}"
 
-
-    except User.DoesNotExist:
+    except:
         # Handle the case when the user with the given username doesn't exist
         recievingTech = ""
     
@@ -1007,17 +1167,16 @@ def pdfTracker(request, workOrder_id):
         item_qty_arr.append(item.quantity)
         item_type_arr.append(item.product.product_type.name)
         item_mfg_arr.append(item.mfgnum)
+        if item.issue == "" or item.issue == None:
+            item.issue = ""
         
-        if item.product.product_type == 2:
-            if item.custom_product_description is None:
-                item.custom_product_description = ''
-            item_desc_arr.append(item.custom_product_description)
+        item_issue_arr.append(item.issue)
+        
+        if item.product.id == 2:
             item_arr.append(item.custom_product_name)
+            print("Other")
             
         else:
-            if item.description is None:
-                item.description = ''
-            item_desc_arr.append(item.description)
             item_arr.append(item.product.name)
 
 
@@ -1030,7 +1189,7 @@ def pdfTracker(request, workOrder_id):
     p = canvas.Canvas(buffer, pagesize=landscape(letter), bottomup=0)
 
     ctc = .3
-    logo = -.7
+    logo = -.75
     account = -.7
     accountName = -.1
 
@@ -1102,7 +1261,10 @@ def pdfTracker(request, workOrder_id):
         p.line(x_*inch, 7.2*inch, x1_*inch, 7.2*inch)  # Bottom horizontal line total
 
         p.setFont("Helvetica", 10)
-        p.drawString(logo*inch, -.2*inch, "Simnar Logo")
+        p.saveState()
+        p.scale(1,-1)
+        p.drawImage(logoPNG, logo*inch, .1 * inch, width=70, height=30, mask=[0,0,0,0,0,0])
+        p.restoreState()
         p.setFont("Helvetica-Bold", 10)
         p.drawString(ctc*inch, -.2*inch, "Customer Repair Tracking Card")
         
@@ -1172,8 +1334,8 @@ def pdfTracker(request, workOrder_id):
         p.line(l9x1*inch, 4.43*inch,l9x2*inch, 4.43*inch)
         p.line(l9x1*inch, 4.73*inch,l9x2*inch, 4.73*inch)
 
-        itemdesc = item_desc_arr[counter]
-        part1 = itemdesc[:45]
+        itemdesc = item_issue_arr[counter]
+        part1 = itemdesc[0:45]
         part2 = itemdesc[50:100]
         part3 = itemdesc[90:135]
 
@@ -1194,7 +1356,7 @@ def pdfTracker(request, workOrder_id):
         p.drawString(numID*inch, 5.45*inch, "#")
         p.drawString(num*inch, 5.45*inch, str(item_number_arr[counter]))
         p.setFont("Helvetica", 10)
-        p.drawString(colorId*inch, 7*inch, "Color ID: "+ workOrder.color)
+        p.drawString(colorId*inch, 7*inch, "Color ID: "+ c)
         
 
 

@@ -13,14 +13,22 @@
     }
 </style>
 <div class="row">
-    <div class="col-10">
+    <div class="col-8">
         <h1>Take Back Sheet View</h1>
     </div>
-    <div class="col-2">
-        <p>Status</p>
+    <div class="col-4">
+        <form>
+            <label for="status">Change Status:</label>
+            <select id="workOrderStatus" name="workOrderStatus" style="font-weight: 700;">
+                <option value="" disabled></option>
+                {% for choice in choices %}
+                    <option style="font-weight: 800;" value="{{ choice }}" {% if choice == workOrder.status %}selected{% endif %}>
+                        {{ choice }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
     </div>
-    
-
 </div>
 
 <div class="row">
@@ -28,7 +36,8 @@
         {% csrf_token %}
         <table class="table">
             <tr>
-                <th>Product</th>
+                <th>Name</th>
+                <th>Instrument Type</th>
                 <th>Description</th>
                 <th>Technician</th>
                 <th>Status</th>
@@ -36,8 +45,17 @@
             </tr>
             {% for i in workOrderItems %}
                 <tr class="{% if i.qc == 'QC_FAIL' %}failed{% elif i.qc == 'QC_PASS' %}passed{% endif %}">
+                    {% if i.product.id == 2 %}
+                        <td>{{i.custom_product_name}}</td>
+                    {% else %}
+                        <td>{{i.product.name}}</td>
+                    {% endif %}
                     <td style="white-space: nowrap;">{{ i.product }}</td>
-                    <td>{{ i.description}}</td>
+                    {% if i.product.id == 2 %}
+                        <td>{{ i.custom_product_description}}</td>
+                    {% else %}
+                        <td>{{ i.description}}</td>
+                    {% endif %}
                     <td>
                         <select name="technician" data-item-id="{{ i.id }}">
                             {% for tech_key, tech_value in form.technician.field.choices %}
@@ -51,8 +69,7 @@
                                 <option value="{{ status_key }}" {% if i.status == status_key %}selected="selected"{% endif %}>{{ status_value }}</option>
                             {% endfor %}
                         </select>
-                    </td>
-                    
+                    </td>                   
                     <td>
                         <select  name="qc" data-item-id="{{ i.id }}">
                             {% for qc_key, qc_value in form.qc.field.choices %}
@@ -66,16 +83,25 @@
     </form>
 </div>
 
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     let site_url = '{{ site_url }}';
+    let workOrder_id = '{{workOrder_id}}'
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
 $(document).ready(function() {
     // Get the CSRF token from the template
     var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
     var apiUrl = site_url +'/workOrder/api/workOrderView/';
+
+    $('select[name="workOrderStatus"]').on('change', function(){
+        var selectedStatus = $(this).val();
+        var id = workOrder_id
+
+        updateData(apiUrl, 'workOrderStatus', selectedStatus, csrfToken, id);
+
+    })
 
     // Attach a change event listener to the "technician" dropdown
     $('select[name="technician"]').on('change', function() {
@@ -113,6 +139,7 @@ $(document).ready(function() {
         var headers = {
             'X-CSRFToken': csrfToken
         };
+        
 
         $.ajax({
             type: 'POST',

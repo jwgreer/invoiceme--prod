@@ -39,6 +39,8 @@ urlpatterns = [
     path("workOrderHistory/", trackingCardViews.workOrderHistory, name="workOrderHistory"),
     path("deleteWorkOrderItem/<int:workOrder_id>/<int:id>/", trackingCardViews.deleteWorkOrderItem, name="deleteWorkOrderItem"),
     path("workOrderView/<int:workOrder>/", trackingCardViews.workOrderView, name="workOrderView"),
+    path('signature_page/<int:workOrder_id>/', trackingCardViews.signature_page, name='signature_page'),
+    path('signature_page/shopWorkDashboard', trackingCardViews.shopWorkDashboard, name='shopWorkDashboard'),
 
 
 
@@ -66,4 +68,7 @@ urlpatterns = [
     path('workOrder/api/addColor/<int:workOrder_id>/', trackingCardViews.workOrderColorAPI, name="workOrderColorAPI"),
     path('workOrder/api/workOrderView/', trackingCardViews.workOrderViewAPI, name="workOrderViewAPI"),
     path('workOrder/api/workOrderEnrichment/', trackingCardViews.workOrderEnrichment, name="workOrderEnrichment"),
-] 
+    path('workOrder/api/signature/', trackingCardViews.signatureAPI, name="signatureAPI"),
+    path('workOrder/api/addItemTestAPI/', trackingCardViews.addItemTestAPI, name="addItemTestAPI"),
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

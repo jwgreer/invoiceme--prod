@@ -10,6 +10,11 @@ class Client(models.Model):
     address = models.TextField()
     tax = models.FloatField(max_length=10, default= 0.0)
     created_by = models.CharField(max_length=100, blank=True, null=True)
+    #street_address = models.CharField(max_length=255)
+    #city = models.CharField(max_length=100)
+    #state = models.CharField(max_length=50)
+    #postal_code = models.CharField(max_length=20)
+    tax = models.FloatField(default=0.0)
 
     def __str__(self):
         return self.name
@@ -146,7 +151,8 @@ class WorkOrderItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=100, blank=True, null=True)
     last_updated_at = models.DateTimeField(auto_now=True)
-    description = models.TextField(max_length=100, blank=True, null=True)
+    description = models.TextField(max_length=35, blank=True, null=True)
+    issue = models.TextField(max_length=125, blank=True, null=True)
     mfgnum = models.CharField(max_length=50, blank=True, null=True)
     number = models.CharField(max_length=10, default="", blank=True, null=True)
     status = models.CharField(max_length=25, choices=STATUS_CHOICES, default="Waiting_on_Assignment")
@@ -162,5 +168,23 @@ class WorkOrderItem(models.Model):
     def save(self, *args, **kwargs):
         self.last_updated_at = timezone.now()
         super(WorkOrderItem, self).save(*args, **kwargs)
+
+class Signature(models.Model):
+    image = models.ImageField(upload_to='static/img/signatures/') # make non editable
+    customer_last_name = models.CharField(max_length=50, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    workOrder = models.ForeignKey(WorkOrders, on_delete=models.CASCADE) # remove default
+
+    def __str__(self):
+        return f'Signature {self.id}'
+    
+class CompanyRepSignature(models.Model):
+    companyRep = models.ImageField(upload_to='static/img/signatures/') # make non editable
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    workOrder = models.ForeignKey(WorkOrders, on_delete=models.CASCADE) # remove default
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Signature {self.id}'
         
 

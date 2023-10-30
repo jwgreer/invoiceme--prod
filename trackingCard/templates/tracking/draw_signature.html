@@ -1,0 +1,121 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
+
+<h1>Signature Page</h1>
+    
+    <iframe src="{% url 'invoice:pdfCustomerTracking' workOrder_id %}#toolbar=0" width="60%" height="600"></iframe>
+    <p>Sign Here:</p>
+
+    <canvas id="signature-pad" width="500" height="200" style="border: 2px solid black;"></canvas>
+    <br>
+    <div class="row">
+        <div class="col">
+            
+        </div>
+        <div class="col">
+            <!--<p>Enter Last Name</p>
+            <input type="text" name='customerLastName'>
+            -->     
+            <!-- Include the CSRF token inside a form element -->
+            <form method="post" enctype="multipart/form-data" id="signature-form">
+                {% csrf_token %}
+                {{ form.as_p }}   
+                <button type="submit">Upload Signature</button>
+            </form>
+        </div>
+        <div class="col">
+            <button id="clear-button">Clear Signature</button>
+        </div>
+        <div class="col">
+            
+        </div>
+    </div>
+    
+    
+
+
+    <script>
+        let workOrder_id = '{{workOrder_id}}';
+        console.log(workOrder_id);
+
+        $(document).ready(function () {
+        var signaturePad = new SignaturePad(document.getElementById('signature-pad'), {
+            penColor: 'orange',
+            backgroundColor: 'white',
+            minWidth: 5,  // Adjust this value to make the signature thicker
+            maxWidth: 7   // Adjust this value to control the maximum thickness
+        });
+        var clearButton = document.getElementById('clear-button');
+
+        clearButton.addEventListener('click', function () {
+            signaturePad.clear();
+        });
+    });
+
+        
+
+
+function dataURItoBlob(dataURI) {
+    var byteString = atob(dataURI.split(',')[1]);
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([ab], { type: mimeString });
+}
+      $(document).ready(function () {
+    var signaturePad = new SignaturePad(document.getElementById('signature-pad'));
+    var clearButton = document.getElementById('clear-button');
+    var form = document.getElementById('signature-form');
+
+    
+    clearButton.addEventListener('click', function () {
+        signaturePad.clear();
+    });
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Create a FormData object to send the form data
+        var formData = new FormData(form);
+
+        // Convert the signature data to an image and append it to the FormData
+        var signatureData = signaturePad.toDataURL();
+        var blob = dataURItoBlob(signatureData);
+        formData.append('image', blob, 'signature.png');
+        formData.append('workOrder_id', workOrder_id);
+
+        // Use jQuery to submit the FormData via AJAX
+        $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:8000/workOrder/api/signature/', // Replace with your actual endpoint
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                signaturePad.clear();
+                window.location.href = "{% url 'invoice:createWorkOrder' %}";
+            }
+        });
+    });
+});
+    </script>
+ 
+    
+</body>
+</html>
+
+
+
+
+{% endblock %}
