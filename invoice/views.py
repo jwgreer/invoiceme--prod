@@ -84,7 +84,7 @@ def check_login(request):
 @login_required(login_url='invoice:loginPage')
 def home(request):
     context= {}
-    return render(request, 'index/home.html', context)
+    return render(request, 'tracking/home.html', context)
 
 @api_view(['POST'])
 def createInvoiceAPI(request):

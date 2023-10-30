@@ -9,7 +9,8 @@ app_name = 'invoice'
 
 urlpatterns = [
     path('', views.landingPage, name='landingPage'),
-    path('home/', views.home, name='home'),
+    #path('home/', views.home, name='home'),
+    path('home/', trackingCardViews.createWorkOrder, name='home'),
     path('createInvoice/', views.createInvoice, name='createInvoice'),
     path('createInvoice2/', views.createInvoice2, name='createInvoice2'),
     path("invoiceHistory/", views.invoiceHistory, name="invoiceHistory"),
