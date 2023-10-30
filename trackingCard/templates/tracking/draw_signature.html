@@ -42,6 +42,7 @@
 
     <script>
         let workOrder_id = '{{workOrder_id}}';
+        let site_url = '{{ site_url }}';
         console.log(workOrder_id);
 
         $(document).ready(function () {
@@ -98,7 +99,7 @@ function dataURItoBlob(dataURI) {
         // Use jQuery to submit the FormData via AJAX
         $.ajax({
             type: 'POST',
-            url: 'http://127.0.0.1:8000/workOrder/api/signature/', // Replace with your actual endpoint
+            url: site_url + '/workOrder/api/signature/', // Replace with your actual endpoint
             data: formData,
             processData: false,
             contentType: false,
@@ -109,7 +110,7 @@ function dataURItoBlob(dataURI) {
         });
     });
 });
-    </script>
+</script>
  
     
 </body>

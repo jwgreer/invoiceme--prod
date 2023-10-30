@@ -234,6 +234,11 @@ def workOrderColorAPI(request, workOrder_id):
 
     if color is None:
         color = color_list[0]
+        try:
+            work_order.color = color
+            work_order.save()
+        except:
+            pass
     elif color not in color_list:
         color = "red"  # Use the first color if there's no second recent work order
     else:
