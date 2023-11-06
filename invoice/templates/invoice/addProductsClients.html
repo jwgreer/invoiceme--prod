@@ -2,22 +2,30 @@
 
 {% block content %}
 
-<h1>Add Products and Clients</h1>
+<h1 style="text-align: center;">Add Instruments and Clients</h1>
 
-<div class="row">
-    <div class="col-md-4 card card-body">
-        <a href="{% url 'invoice:createProductType' %}" target="_blank" class="btn btn-primary">Add Product Type</a>
+<div class="container">
+    <div class="row" >
+        <div class="col-md-4 card card-body">
+            <a href="{% url 'invoice:createProductType' %}" target="_blank" class="btn btn-primary">Add Instrument Type</a>
+        </div>
+        <div class="col-md-4 card card-body">
+            <a href="{% url 'invoice:createProduct' %}" target="_blank" class="btn btn-primary">Add Instrument</a>
+        </div>
+        
+        
     </div>
-    <div class="col-md-4 card card-body">
-        <a href="{% url 'invoice:createProduct' %}" target="_blank" class="btn btn-primary">Add Product</a>
-    </div>
-    <div class="col-md-4 card card-body">
-        <a href="{% url 'invoice:createClient' %}" target="_blank" class="btn btn-primary">Add Client</a>
-    </div>
-    <div class="col-md-4 card card-body">
-        <a href="{% url 'invoice:createClientContact' %}" target="_blank" class="btn btn-primary">Add Client Contact</a>
+    <div class="row">
+        <div class="col-md-4 card card-body">
+            <a href="{% url 'invoice:createClient' %}" target="_blank" class="btn btn-primary">Add Client</a>
+        </div>
+        <div class="col-md-4 card card-body">
+            <a href="{% url 'invoice:createClientContact' %}" target="_blank" class="btn btn-primary">Add Client Contact</a>
+        </div>
+    
     </div>
 </div>
+
 
 
 

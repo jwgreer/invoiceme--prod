@@ -60,20 +60,20 @@
 
 <form method="post" id="workOrderViewForm">
     {% csrf_token %}
-    <div class="row">
-            <div class="col-lg-2 card">
+    <div class="row" style="text-align: center;">
+            <div class="col-lg card" style="margin: 5px;">
                 <div id="is_rush_d">Rush</div>
                 {{workOrderForm.is_rush}}
             </div>
-            <div class="col-lg-2 card">
+            <div class="col-lg card" style="margin: 5px;"> 
                 <div id="quote_required_d">Quote Required</div>
                 {{workOrderForm.quote_required}}
             </div>
-            <div class="col-lg-6 card">
+            <div class="col-lg-6 card" style="margin: 5px;">
                 <div id="specialInstructions_d">Instructions - {{workOrder.specialInstructions}}</div>
                 <input type="text" id="specialInstructions" name="specialInstructions" maxlength="200">
             </div>
-            <div class="col-lg-2 card">
+            <div class="col-lg-2 card" style="margin: 5px;">
                 <div id="return_by_d">Return By</div>
                 {{workOrderForm.return_by}}
             </div>
@@ -85,20 +85,24 @@
     
 
 <div class="row" style="margin: 15px 0px 0px 15px; padding-bottom: 10px;">
-        <div class="col-md-5">
+        <div class="col-md-2" style="margin: 10px;">
                 <span>
-                   <span><a href="{% url 'invoice:pdfTracker' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Blue Card PDF</a> </span>  
-                   <span><a href="{% url 'invoice:pdfCustomerTracking' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Take Back Sheet PDF</a></span>              
+                   <span style="margin: 10px;"><a href="{% url 'invoice:pdfTracker' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Blue Card PDF</a> </span>     
                 </span>
-        </div>    
-        <div class="col-md-5">
-            <span><a href="{% url 'invoice:customWorkOrderItem' workOrder_id %}"><button class="btn btn-success">Add Instrument Not Listed</button></a></span>       
+        </div> 
+        <div class="col-md-2" style="margin: 10px;">
+            <span> 
+               <span style="margin: 10px;"><a href="{% url 'invoice:pdfCustomerTracking' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Take Back Sheet PDF</a></span>              
+            </span>
+    </div>  
+        <div class="col-md-5" style="margin: 10px;">
+            <span style="margin: 5px;"><a href="{% url 'invoice:customWorkOrderItem' workOrder_id %}"><button class="btn btn-success">Add Instrument Not Listed</button></a></span>       
         </div>
-        <div class="col-md-2">
-            <a href="{% url 'invoice:signature_page' workOrder_id %}" target="_blank" class="btn btn-primary">Sign Take Back Sheet</a> 
+        <div class="col-md-2" style="margin: 10px;">
+            <span style="margin: 5px;"><a href="{% url 'invoice:signature_page' workOrder_id %}" target="_blank" class="btn btn-primary">Sign Take Back Sheet</a></span>
         </div>
     </div>
-    <div class="row" id="test">
+    <div class="row" id="test" style="text-align: center;">
         <div class="col-lg-4 card card-body" id="table-container-item">
             <span>
             <table class="table" id="item-table">
@@ -134,7 +138,7 @@
         </span>
         </div>
 
-        <div class="col-lg-8 ">        
+        <div class="col-lg-8 " style="text-align: center;">        
             <div>            
                 <div class="card card-body" style="margin-bottom: 15px;">
                     <form method="get">

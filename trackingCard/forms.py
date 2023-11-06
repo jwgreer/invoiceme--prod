@@ -111,11 +111,11 @@ class WorkOrderItemOtherForm(forms.ModelForm):
 
 
 class WorkOrderEnrichmentForm(forms.Form):
-    is_rush = forms.BooleanField(required=False, label="RUSH?  ")
+    is_rush = forms.BooleanField(required=False, label="RUSH?",widget=forms.CheckboxInput(attrs={'style': 'height: 40px; margin: 5px'}))
     return_by = forms.DateField(
     required=False,
     widget=forms.DateInput(attrs={'class': 'form-control datepicker','autocomplete': 'off'}), label="RETURN BY:")
-    quote_required = forms.BooleanField(required=False, label="QUOTE? ")
+    quote_required = forms.BooleanField(required=False, label="QUOTE?", widget=forms.CheckboxInput(attrs={'style': 'height: 40px; margin: 5px'}))
     specialInstructions = forms.CharField(
         max_length=250,
         required=False,

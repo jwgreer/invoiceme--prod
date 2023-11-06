@@ -1,11 +1,23 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<div style="padding-top: 15px;">
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_table }}
-        <button type="submit" class="btn-primary">Submit</button>
-    </form>
+<div class="row">
+    <div class="col-5">
+
+    </div>
+    <div class="col-1">
+        <div style="padding-top: 15px;">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_table }}
+                <button type="submit" class="btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-2">
+
+    </div>
+
 </div>
+
 {% endblock content %}
