@@ -63,6 +63,9 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'description', 'price', 'product_type']
+        labels = {
+            'product_type': 'Instrument Type',
+        }
 
 class InvoiceItemFormEdit(forms.ModelForm):
     class Meta:
