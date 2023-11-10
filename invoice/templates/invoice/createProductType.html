@@ -1,11 +1,14 @@
 {% extends "base/base.html" %}
 
 {% block content %}
+<div style="text-align: center;">
+    <h1>Add Instrument Type</h1>
+    <br>
+    <form method="POST">
+        {% csrf_token %}
+        {{ productTypeForm }}
+        <button type="submit">Save</button>
+    </form>
+    {% endblock content %}
+</div>
 
-<h1>Add Product Type</h1>
-<form method="POST">
-    {% csrf_token %}
-    {{ productTypeForm }}
-    <button type="submit">Save</button>
-</form>
-{% endblock content %}
