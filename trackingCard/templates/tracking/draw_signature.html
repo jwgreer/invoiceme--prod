@@ -6,8 +6,8 @@
 {% block content %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
-
-<h1>Signature Page</h1>
+<div style="text-align:  center;">
+    <h1>Signature Page</h1>
     
     <iframe src="{% url 'invoice:pdfCustomerTracking' workOrder_id %}#toolbar=0" width="60%" height="600"></iframe>
     <p>Sign Here:</p>
@@ -39,11 +39,14 @@
     <div class="row" style="min-height: 150px;">
 
     </div>
+
+</div>
+
     
     
 
 
-    <script>
+<script>
         let workOrder_id = '{{workOrder_id}}';
         let site_url = '{{ site_url }}';
         console.log(workOrder_id);
