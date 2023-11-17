@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="row">
-    <h1 style="text-align: center;">Past Take Back Sheets</h1>
+    <h1 style="text-align: center;">History of Take Back Sheets</h1>
 </div>
 <div class="row" style="text-align: center;">
     <table class="table">
@@ -29,10 +29,10 @@
               </td>
               <td>{{ workOrder.get_status_display }}</td>
               <td>
-                <a href="{% url 'invoice:workOrderView' workOrder %}">view</a>
+                <a href="{% url 'invoice:workOrderView' workOrder %}"><i class="bi bi-eye"></i></a>
               </td>
               <td>
-                <a href="{% url 'invoice:addItemsWorkOrder' workOrder.workOrder_num %}" >Edit</a>
+                <a href="{% url 'invoice:addItemsWorkOrder' workOrder.workOrder_num %}" ><i class="bi bi-pencil-square"></i></a>
               </td>
               </td>
             </tr>
@@ -43,7 +43,7 @@
           {% endfor %}
         </tbody>
       </table>
-      <div class="pagination">
+      <div class="pagination d-flex justify-content-center align-items-center center-content">
         <span class="step-links">
           {% if workOrders.has_next %}
             <a href="?page={{ workOrders.paginator.num_pages }}">last</a>

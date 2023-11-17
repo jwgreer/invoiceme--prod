@@ -33,11 +33,20 @@ class ClientContact(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Normal')
     created_by = models.CharField(max_length=100, blank=True, null=True)
 
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
 class ProductType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+    
+class Color(models.Model):
+    color = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.color
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
@@ -45,9 +54,12 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE)
     created_by = models.CharField(max_length=100, blank=True, null=True)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE, blank=True, null=True) # i need to get rid of this?
 
     def __str__(self):
         return self.name
+    
+
     
 class Discount(models.Model):
     amount = models.FloatField()
@@ -118,6 +130,7 @@ class WorkOrders(models.Model):
     specialInstructions = models.CharField(max_length=250, default="", null=True, blank=True)
     created_by = models.CharField(max_length=100, blank=True, null=True)
     color = models.CharField(max_length=100, blank=True, null=True)
+    account_contact = models.ForeignKey(ClientContact, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return str(self.workOrder_num)
@@ -157,6 +170,7 @@ class WorkOrderItem(models.Model):
     number = models.CharField(max_length=10, default="", blank=True, null=True)
     status = models.CharField(max_length=25, choices=STATUS_CHOICES, default="Waiting_on_Assignment")
     qc = models.CharField(max_length=20, choices=QC_STATUS_CHOICES, default="NO_QC")
+    color = models.ForeignKey(Color, on_delete=models.CASCADE, blank=True, null=True)
     
     # Add fields for custom product
     custom_product_name = models.CharField(max_length=200, blank=True, null=True)
@@ -186,5 +200,7 @@ class CompanyRepSignature(models.Model):
 
     def __str__(self):
         return f'Signature {self.id}'
+    
+
         
 

@@ -30,13 +30,18 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.shortcuts import get_object_or_404
 
 
-
 @api_view(['POST'])
 def addItemTestAPI(request):
     if request.method == "POST":
         try:
             d = request.data.get('data', {})
-            quantity = int(d["quantity"]) 
+           
+            if d['color'] != None:
+                color_queryset = Color.objects.filter(color=d['color'])
+                color_instance = color_queryset.first()
+                d['color'] = color_instance.pk
+                quantity = int(d["quantity"]) 
+            
             workOrder_id = d.get('workOrder', None)  # Use get with a default value to avoid KeyError
         except (KeyError, ValueError) as e:
             # Handle the exception by returning an error response
@@ -44,7 +49,6 @@ def addItemTestAPI(request):
             return Response("PLEASE ENTER A VALID NUMBER", status=status.HTTP_400_BAD_REQUEST)
 
         if d['product'] in ["3", "4"]:
-            print("test")
             i = 0
             
             if quantity > 1:
@@ -58,7 +62,6 @@ def addItemTestAPI(request):
                     if serializer.is_valid():
                         serializer.save()
                         created_items.append(serializer.data)
-                        print(i)
                         i += 1
                 return Response(created_items, status=status.HTTP_201_CREATED)
             
@@ -72,7 +75,6 @@ def addItemTestAPI(request):
         else:
             
             d['number'] = str(WorkOrderItem.objects.filter(workOrder=workOrder_id).count() + 1)
-            print(d['issue'])
             # If the product is not "3" or "4", handle it as a single item
             serializer = workOrderItemSerializer(data=d)
 
@@ -94,7 +96,6 @@ def workOrderEnrichment(request):
             workOrder = WorkOrders.objects.get(pk=id)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        print(data)
         
         
         if type == 'is_rush':
@@ -128,6 +129,14 @@ def workOrderEnrichment(request):
                 return Response(status=status.HTTP_200_OK)
             except:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+        elif type == "account_contact":
+            try:
+                client_contact = ClientContact.objects.get(pk=value) 
+                workOrder.account_contact = client_contact
+                workOrder.save()
+                return Response(status=status.HTTP_200_OK)
+            except:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
@@ -153,11 +162,8 @@ def workOrderViewAPI(request):
             item = WorkOrderItem.objects.get(pk=id)
         except: 
             pass
-
-        print(type)
         if type == 'technician':
             if value == 'none':
-                print("none")
                 item.technician = None
                 item.save()
                 return Response(status=status.HTTP_200_OK)
@@ -258,7 +264,6 @@ def workOrderColorAPI(request, workOrder_id):
         serializer = workOrderColorSerializer(work_order)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
-        print("Error:", str(e))
         return Response({'message': 'Error updating work order.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -282,7 +287,6 @@ def newestWorkOrderProductAPI(request, workOrder_id):
 def deleteWorkOrderItemAPI(request):
     try:
         data = request.data
-        print(data)
         workOrder_id = data.get('workOrder_id', '')
         id = data.get('id', '')
         item = WorkOrderItem.objects.get(pk=id)
@@ -366,7 +370,6 @@ def itemWorkOrderAPI(request, workOrder_id):
 
     elif request.method == "POST":
         d = request.data
-        print(d)
         i = 0
         quantity = int(d["quantity"])  # Use get with a default value to avoid KeyError
 
@@ -383,7 +386,6 @@ def itemWorkOrderAPI(request, workOrder_id):
                     if serializer.is_valid():
                         serializer.save()
                         created_items.append(serializer.data)
-                        print(i)
                         i += 1
                 return Response(created_items, status=status.HTTP_201_CREATED)
             
@@ -397,7 +399,6 @@ def itemWorkOrderAPI(request, workOrder_id):
         else:
             
             d['number'] = str(WorkOrderItem.objects.filter(workOrder=workOrder_id).count() + 1)
-            print(d['issue'])
             # If the product is not "3" or "4", handle it as a single item
             serializer = workOrderItemSerializer(data=d)
 
@@ -453,7 +454,6 @@ def editWorkOrderItemAPI(request, workOrder_id, id):
         return Response({'detail': 'Work Order Item not found'}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'PUT':
-        # Assuming you have a serializer for your InvoiceItem model
         serializer = workOrderItemSerializer(workOrder_item, data=request.data)
         
         if serializer.is_valid():
@@ -492,7 +492,6 @@ def editWorkOrderItem(request, workOrder_id, id):
 @login_required(login_url='invoice:loginPage')
 def createWorkOrder(request):
     current_user = request.user
-    print(current_user.username)
     clients = Client.objects.all()
     clientFilter = ClientFilter(request.GET, queryset=clients)
     clients = clientFilter.qs
@@ -500,7 +499,6 @@ def createWorkOrder(request):
         form = WorkOrderForm(request.POST)
         if form.is_valid():
             client_id = form.cleaned_data['client'].id
-            print(client_id)
 
             today = date.today()
 
@@ -521,8 +519,7 @@ def createWorkOrder(request):
 
             # Define the API endpoint URL where you want to send the POST request
             api_url = f'{settings.SITE_URL}/workOrder/api/createWorkOrder/'
-            print(api_url)
-            print(api_payload)
+
 
             try:
                 response = requests.post(api_url, json=api_payload)
@@ -531,14 +528,10 @@ def createWorkOrder(request):
                 if response.status_code == 201:  # Replace with the appropriate status code
                     response_data = json.loads(response.text)
                     workOrder_id = response_data.get('workOrder_num')
-                    print(response_data)
                     
                     api_url = f'{settings.SITE_URL}/workOrder/api/addColor/{workOrder_id}/'
                     api_payload = {"id": workOrder_id}
                     response = requests.put(api_url, json=api_payload)
-
-                    print(response_data)
-                    print(workOrder_id)
                     # Invoice created successfully
                     return redirect('invoice:addItemsWorkOrder', workOrder_id)
                 else:
@@ -607,6 +600,7 @@ def addItemsWorkOrder(request, workOrder_id):
 
     
     workOrder = WorkOrders.objects.get(pk=workOrder_id)
+    colors = Color.objects.all()
 
     if (not request.user.groups.filter(name='admin')) and workOrder.status != "Waiting_on_Assignment":
         s = workOrder.status
@@ -625,27 +619,14 @@ def addItemsWorkOrder(request, workOrder_id):
     myFilter = ProductsFilter(request.GET, queryset=products)
     products = myFilter.qs
 
-    paginator = Paginator(products, 5)  # Display 10 invoices per page (you can adjust the number)
+    paginator = Paginator(products, 5)  
     page = request.GET.get('page')
-    products = paginator.get_page(page)
+    paginated_products = paginator.get_page(page)
 
     otherForm = WorkOrderItemOtherForm(request.POST)
     initial_return_by = (datetime.now() + timedelta(days=7)).date().strftime('%Y-%m-%d')
-    print(workOrder.return_by)
-    if workOrder.return_by is None:
-        initial_return_by = (datetime.now() + timedelta(days=7)).date().strftime('%Y-%m-%d')
-        workOrder.return_by = initial_return_by
-        workOrder.save()
-    else:
-        initial_return_by = workOrder.return_by
-    initial = {
-        'is_rush': workOrder.is_rush,
-        'quote_required': workOrder.quote_required,
-        'specialInstructions': workOrder.specialInstructions,
-        'return_by': initial_return_by
-    }
 
-    workOrderForm = WorkOrderEnrichmentForm(request.POST or None,initial=initial)
+    
 
     if request.method == 'POST':
         formset = WorkOrderItemFormSet(request.POST)
@@ -667,6 +648,23 @@ def addItemsWorkOrder(request, workOrder_id):
     else:
         formset = WorkOrderItemFormSet()
 
+    if workOrder.return_by is None:
+        initial_return_by = (datetime.now() + timedelta(days=7)).date().strftime('%Y-%m-%d')
+        workOrder.return_by = initial_return_by
+        workOrder.save()
+    else:
+        initial_return_by = workOrder.return_by
+    initial = {
+        'is_rush': workOrder.is_rush,
+        'quote_required': workOrder.quote_required,
+        'specialInstructions': workOrder.specialInstructions,
+        'return_by': initial_return_by,
+        'account_contact': workOrder.account_contact,
+        'colors': colors,
+    }
+
+    workOrderForm = WorkOrderEnrichmentForm(request.POST or None, initial=initial, client_id=client.id)
+
     context = {
         'client': client,
         'workOrder_id': workOrder_id,
@@ -678,7 +676,9 @@ def addItemsWorkOrder(request, workOrder_id):
         'workOrderItems': workOrderItems,
         'workOrder': workOrder,
         'workOrderForm': workOrderForm,
-        'initial_return_by': initial_return_by
+        'initial_return_by': initial_return_by,
+        'colors': colors,
+        'paginated_products': paginated_products,
     }
 
     return render(request, 'tracking/addItemsWorkOrder.html', context)
@@ -737,9 +737,8 @@ def workOrderView(request, workOrder):
                     
                     # Retrieve the existing WorkOrderItem instance based on a unique identifier
                     item_id = form.cleaned_data['item_id']
-                    print(item_id)  # Replace 'item_id' with the actual field name
+
                     item = WorkOrderItem.objects.get(pk=item_id)
-                    print(item_id)
                     
                     # Update the fields and save the item
                     item.status = status
@@ -776,8 +775,8 @@ def signature_page(request, workOrder_id):
 
 @api_view(['POST'])
 def signatureAPI(request):
+    
     try:
-        print(request.data)
         image = request.data.get('image', '')  # Get the image data from the request
         workOrder_id = int(request.data.get('workOrder_id',''))
 
@@ -1140,10 +1139,11 @@ def pdfTracker(request, workOrder_id):
         items = ""
 
     try:
-        primaryContact = ClientContact.objects.get(client=workOrder.client, status='Primary')
-        primaryContact = f"{primaryContact.first_name} {primaryContact.last_name}"
+        workOrderContact = workOrder.account_contact
+
+        workOrderContact = f"{workOrderContact.first_name} {workOrderContact.last_name}"
     except:
-        primaryContact = ""
+        workOrderContact = ""
     
     try:
         c = workOrder.color
@@ -1161,6 +1161,7 @@ def pdfTracker(request, workOrder_id):
     item_qty_arr = []
     item_type_arr = []
     item_issue_arr = []
+    item_color_arr = []
     counter = 0
 
     try:
@@ -1172,25 +1173,26 @@ def pdfTracker(request, workOrder_id):
         recievingTech = ""
     
     for item in items:
+        if item.color is None:
+            item_color_arr.append("")
+        else:
+            item_color_arr.append(item.color.color)
+        
         item_number_arr.append(item.number)
         item_qty_arr.append(item.quantity)
         item_type_arr.append(item.product.product_type.name)
         item_mfg_arr.append(item.mfgnum)
+        
         if item.issue == "" or item.issue == None:
             item.issue = ""
         
         item_issue_arr.append(item.issue)
         
+        
         if item.product.id == 2:
             item_arr.append(item.custom_product_name)
-            print("Other")
-            
         else:
             item_arr.append(item.product.name)
-
-
-
-
 
     buffer = io.BytesIO()
 
@@ -1217,7 +1219,8 @@ def pdfTracker(request, workOrder_id):
     num = 2.0
     colorId = 1.3
 
-    color_ = 1.25
+    color_ = 1.0
+    color_title = 1.42
     instname = .45
     manufct = .18
     isnttype = .42
@@ -1241,8 +1244,8 @@ def pdfTracker(request, workOrder_id):
     l9x1 = -.7
     l9x2 = 2.35
     l10x1 = .18
-    l10x2 = 1.2
-    l11x1 = 1.63
+    l10x2 = 1.0
+    l11x1 = 1.43
     l11x2 = 2.3
     l12x2 = 2.3
     l13x1 = -.1
@@ -1289,7 +1292,7 @@ def pdfTracker(request, workOrder_id):
         
         p.drawString(account*inch, .8*inch, "Contact: ")
         p.line(l1x1*inch, .825*inch,l1x2*inch, .825*inch)
-        p.drawString(contact*inch, .8*inch, primaryContact)
+        p.drawString(contact*inch, .8*inch, workOrderContact)
 
         p.drawString(account*inch, 1.1*inch, "Customer P.O. #:")
         p.line(l4x1*inch, 1.15*inch,l1x2*inch, 1.15*inch)
@@ -1322,8 +1325,9 @@ def pdfTracker(request, workOrder_id):
         p.line(l10x1*inch, 2.92*inch,l10x2*inch, 2.92*inch)
         p.drawString(manufct*inch, 2.9*inch, item_mfg_arr[counter])
 
-        p.drawString(color_*inch, 2.9*inch, "Color: ")
+        p.drawString(color_*inch, 2.9*inch, "clr/mtl: ")
         p.line(l11x1*inch, 2.92*inch,l11x2*inch, 2.92*inch)
+        p.drawString(color_title*inch, 2.9*inch, item_color_arr[counter])
 
         p.drawString(account*inch, 3.2*inch, "Instrument Type: ")
         p.line(l4x1*inch, 3.22*inch,l12x2*inch, 3.22*inch)
@@ -1404,6 +1408,7 @@ def pdfTracker(request, workOrder_id):
         num = num + 3.6
 
         color_ = color_ + 3.6
+        color_title = color_title + 3.6
         l1x1 = l1x1 + 3.6
         l1x2 = l1x2 + 3.6
         l2x1= l2x1 + 3.6

@@ -18,7 +18,7 @@
     </div>
     <div class="col-4" >
         <form>
-            <label for="status">Change Status:</label>
+            <label for="status"><i class="bi bi-pencil-square"></i> Change Status:</label>
             <select id="workOrderStatus" name="workOrderStatus" style="font-weight: 700;">
                 <option value="" disabled></option>
                 {% for choice in choices %}
@@ -38,7 +38,7 @@
             <tr>
                 <th>Name</th>
                 <th>Instrument Type</th>
-                <th>Description</th>
+                <th>Issue</th>
                 <th>Technician</th>
                 <th>Status</th>
                 <th>Quality Control</th>
@@ -51,11 +51,7 @@
                         <td>{{i.product.name}}</td>
                     {% endif %}
                     <td style="white-space: nowrap;">{{ i.product }}</td>
-                    {% if i.product.id == 2 %}
-                        <td>{{ i.custom_product_description}}</td>
-                    {% else %}
-                        <td>{{ i.description}}</td>
-                    {% endif %}
+                    <td>{{i.issue}}</td>
                     <td>
                         <select name="technician" data-item-id="{{ i.id }}">
                             {% for tech_key, tech_value in form.technician.field.choices %}

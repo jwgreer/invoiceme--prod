@@ -11,7 +11,7 @@ admin.site.register(Discount)
 admin.site.register(Tax)
 admin.site.register(WorkOrders)
 admin.site.register(Signature)
-#admin.site.register(WorkOrderItem)
+admin.site.register(Color)
 
 @admin.register(WorkOrderItem)
 class WorkOrderItemAdmin(admin.ModelAdmin):

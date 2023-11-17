@@ -15,7 +15,7 @@ class workOrderSerializer(serializers.ModelSerializer):
 class workOrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkOrderItem
-        fields = ['id', 'workOrder', 'product', 'description', 'quantity','status', 'mfgnum', 'number', 'custom_product_name', 'custom_product_description', 'issue']
+        fields = ['id', 'workOrder', 'product', 'description', 'quantity','status','color', 'mfgnum', 'number', 'custom_product_name', 'custom_product_description', 'issue']
 
     def validate_quantity(self, value):
         if value is None or value < 1:
@@ -25,7 +25,7 @@ class workOrderItemSerializer(serializers.ModelSerializer):
 class workOrderItemOtherSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkOrderItem
-        fields = ['id', 'workOrder', 'quantity','custom_product_name', 'mfgnum','custom_product_description', 'number']
+        fields = ['id', 'workOrder', 'product', 'quantity','custom_product_name', 'color', 'mfgnum', 'custom_product_description', 'issue']
 
 class workOrderItemNumberSerializer(serializers.ModelSerializer):
     class Meta:

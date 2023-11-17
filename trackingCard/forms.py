@@ -111,17 +111,30 @@ class WorkOrderItemOtherForm(forms.ModelForm):
 
 
 class WorkOrderEnrichmentForm(forms.Form):
-    is_rush = forms.BooleanField(required=False, label="RUSH?",widget=forms.CheckboxInput(attrs={'style': 'height: 40px; margin: 5px'}))
-    return_by = forms.DateField(
-    required=False,
-    widget=forms.DateInput(attrs={'class': 'form-control datepicker','autocomplete': 'off'}), label="RETURN BY:")
+    is_rush = forms.BooleanField(required=False, label="RUSH?", widget=forms.CheckboxInput(attrs={'style': 'height: 40px; margin: 5px'}))
+    return_by = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control datepicker', 'autocomplete': 'off'}), label="RETURN BY:")
     quote_required = forms.BooleanField(required=False, label="QUOTE?", widget=forms.CheckboxInput(attrs={'style': 'height: 40px; margin: 5px'}))
-    specialInstructions = forms.CharField(
-        max_length=250,
+    specialInstructions = forms.CharField(max_length=250, required=False, label="SPECIAL INSTRUCTIONS", widget=forms.Textarea(attrs={'rows': 1, 'cols': 40}))
+    
+    account_contact = forms.ModelChoiceField(
+        queryset=ClientContact.objects.none(),
         required=False,
-        label="SPECIAL INSTRUCTIONS",
-        widget=forms.Textarea(attrs={'rows': 1, 'cols': 40})  # Add Textarea widget
+        label="ACCOUNT CONTACT",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="Select Contact"  # Set the default text here
     )
+    
+    def __init__(self, *args, **kwargs):
+        # Retrieve the additional variable from kwargs
+        client_id = kwargs.pop('client_id', None)
+
+        super(WorkOrderEnrichmentForm, self).__init__(*args, **kwargs)
+
+        # Modify the queryset of the account_contact field based on the passed client_id
+        if client_id is not None:
+            self.fields['account_contact'].queryset = ClientContact.objects.filter(client__id=client_id)
+
+    
 
 class WorkOrderItemDelete(forms.ModelForm):
     class Meta:

@@ -7,7 +7,10 @@
     display: flex;
     align-items: center; /* Optional - align content vertically */
 }
-
+.bordered-col {
+        border: 1px solid #000; /* Add your preferred border style here */
+        padding: 10px; /* Optional: Add some padding to the columns for spacing */
+    }
 
 </style>
 
@@ -17,7 +20,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Error</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close close-modal-button" data-dismiss="modal" aria-label="Close" id="close-modal-button"> 
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -25,37 +28,89 @@
                 <p id="error-message"></p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close-modal-button">Close</button>
+                <button type="button" class="btn btn-secondary close-modal-button" data-dismiss="modal" id="close-modal-button_">Close</button>
             </div>
         </div>
     </div>
 </div>
-<style>
-    .bordered-col {
-        border: 1px solid #000; /* Add your preferred border style here */
-        padding: 10px; /* Optional: Add some padding to the columns for spacing */
-    }
 
-    
-</style>
+<div class="modal fade" id="add-item-modal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="" id="">Add Instrument</h5>
+                <button type="button" class="close close-modal-button" data-dismiss="modal" aria-label="Close" id="">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="height: 400px;">
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Django form starts here -->
+                        <form method="post" id="your-form-id">
+                            {% csrf_token %}
 
-<!--
-    <div class="row">
-        
-        <div class="col-lg-4  bordered-col">
-        </div>
-        <div class="col bordered-col">
-        </div>
-        <div class="col bordered-col">
+                            <!-- Place your form fields here -->
+                            <div class="form-group">
+                                {{ form.as_p }}
+                            </div>
 
+                            <!-- Input fields stacked on top of each other -->
+                            <div class="form-group row">
+                                <label for="input2" class="col-sm-2 -form-label" style="width: 100px;">Inst. Name</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="input2" placeholder="Inst. Name" maxlength="20" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="quantity" class="col-sm-2 col-form-label" style="width: 100px;">Quantity</label>
+                                <div class="col-sm-9">
+                                    <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Quantity" min="1" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="mfgNumber" class="col-sm-2 -form-label" style="width: 100px;">MFG #</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="mfgNumber" name="mfgNumber" placeholder="MFG #" maxlength="12" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="colorSelect" class="col-sm-2 col-form-label" style="width: 100px;">Color/Material</label>
+                                <div class="col-sm-9">
+                                    <select id="colorSelect" name="color" class="form-control" required>
+                                        <option style="text-align: center;" value="" disabled selected>Select</option>
+                                        {% for color in colors %}
+                                            <option value="{{ color.color }}">{{ color.color }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="instDescription" class="col-sm-2 -form-label" style="width: 100px;">Inst. Description</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="instDescription" name="instDescription" placeholder="Inst. Description" maxlength="40" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="issueWithInst" class="col-sm-2 -form-label" style="width: 100px;">Issue W/ Inst.</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="issueWithInst" name="issueWithInst" placeholder="Issue W/ Inst." maxlength="125" required>
+                                </div>
+                            </div>
+                            <!-- Submit button -->
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                        <!-- Django form ends here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary close-modal-button" data-dismiss="modal" id="">Close</button>
+            </div>
         </div>
-        <div class="col bordered-col">
-        </div>
-        <div class="col-lg-6 bordered-col">
-        </div>
-    
     </div>
- -->
+</div>
+
 
 
 <form method="post" id="workOrderViewForm">
@@ -73,9 +128,14 @@
                 <div id="specialInstructions_d">Instructions - {{workOrder.specialInstructions}}</div>
                 <input type="text" id="specialInstructions" name="specialInstructions" maxlength="200">
             </div>
-            <div class="col-lg-2 card" style="margin: 5px;">
+            <div class="col-lg card" style="margin: 5px;">
                 <div id="return_by_d">Return By</div>
                 {{workOrderForm.return_by}}
+            </div>
+            <div class="col-lg card" style="margin: 5px;">
+                <div></div>
+                <div id="account_contact_d">Account Contact</div>
+                    {{ workOrderForm.account_contact }}
             </div>
     </div>
 
@@ -87,16 +147,20 @@
 <div class="row" style="margin: 15px 0px 0px 15px; padding-bottom: 10px;">
         <div class="col-md-2" style="margin: 10px;">
                 <span>
-                   <span style="margin: 10px;"><a href="{% url 'invoice:pdfTracker' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Blue Card PDF</a> </span>     
+                   <span style="margin: 10px;"><a href="{% url 'invoice:pdfTracker' workOrder_id %}" target="_blank" class="btn btn-primary"><i class="bi bi-file-richtext"></i> Preview Blue Card</a> </span>     
                 </span>
         </div> 
         <div class="col-md-2" style="margin: 10px;">
             <span> 
-               <span style="margin: 10px;"><a href="{% url 'invoice:pdfCustomerTracking' workOrder_id %}" target="_blank" class="btn btn-primary">Preview Take Back Sheet PDF</a></span>              
+               <span style="margin: 10px;"><a href="{% url 'invoice:pdfCustomerTracking' workOrder_id %}" target="_blank" class="btn btn-primary"><i class="bi bi-filetype-pdf"></i> Preview PDF</a></span>              
             </span>
     </div>  
         <div class="col-md-5" style="margin: 10px;">
-            <span style="margin: 5px;"><a href="{% url 'invoice:customWorkOrderItem' workOrder_id %}"><button class="btn btn-success">Add Instrument Not Listed</button></a></span>       
+            <span style="margin: 5px;">
+                <button onclick="showAddItemModal()" class="btn btn-success">
+                    <i class="bi bi-plus-square"></i> Instrument Not Listed
+                </button>
+            </span>       
         </div>
         <div class="col-md-2" style="margin: 10px;">
             <span style="margin: 5px;"><a href="{% url 'invoice:signature_page' workOrder_id %}" target="_blank" class="btn btn-primary">Sign Take Back Sheet</a></span>
@@ -147,23 +211,7 @@
                         <a class="btn btn-warning" href="{% url 'invoice:addItemsWorkOrder' workOrder_id %}">Reset</a>
                     </form>
                 </div>
-                <div class="pagination text-center" >
-                    <span class="step-links">
-                        {% if products.has_next %}
-                            <a href="?page={{ products.paginator.num_pages }}">last</a>
-                            <a href="?page={{ products.next_page_number }}">next</a>
-                        {% endif %}
-                    
-                        <span class="current-page">
-                            Page {{ products.number }} of {{ products.paginator.num_pages }}.
-                        </span>
-                    
-                        {% if products.has_previous %}
-                            <a href="?page={{ products.previous_page_number }}">previous</a>
-                            <a href="?page=1">first</a>
-                        {% endif %}
-                    </span>
-                </div>
+                
                 <div class="card-body" >
                     <div class="card" style="min-height: 500px;" id="table-container-add-item">
                         {% csrf_token %}
@@ -172,6 +220,7 @@
                                 <th>Inst. Name</th>
                                 <th>Quantity</th>
                                 <th>MFG #</th>
+                                <th>Color/Material</th>
                                 <th>Inst. Description</th>
                                 <th>Issue W/ Inst.</th>
                                 <th>Add Inst.</th>
@@ -188,6 +237,14 @@
                                         <input class="mfgnum" style="width: 100px;" type="text" name="mfgnum" maxlength="12" value="">
                                     </td>
                                     <td>
+                                        <select id="colorSelect" name="color" class = "color" required>
+                                          <option style="text-align: center;" value="" disabled selected>Select</option>
+                                          {% for color in colors %}
+                                            <option value="{{ color.color }}">{{ color.color }}</option>
+                                          {% endfor %}
+                                        </select>
+                                      </td>                                     
+                                    <td>
                                         <textarea class="description" style="height: 75px; word-wrap: break-word;" name="description" maxlength="30"></textarea>
                                     </td>
                                     <td>
@@ -196,12 +253,29 @@
                                     <td>
                                         <input type="hidden" name="product" value="{{ i.pk }}">
                                         <input type="hidden" name="workOrder" value="{{ workOrder_id }}">
-                                        <button type="button" class="submit-button" >Add Instrument</button>
+                                        <button type="button" class="submit-button" ><i class="bi bi-plus-square" style="font-size: 1.5em;"></i></button>
                                     </td>
                                 </tr>
                             {% endfor %}
                         </table>
                     </div>
+                </div>
+                <div class="pagination d-flex justify-content-center align-items-center center-content" >
+                    <span class="step-links">
+                        {% if paginated_products.has_next %}
+                            <a href="?page={{ products.paginator.num_pages }}">last</a>
+                            <a href="?page={{ products.next_page_number }}">next</a>
+                        {% endif %}
+                    
+                        <span class="current-page">
+                            Page {{ paginated_products.number }} of {{ paginated_products.paginator.num_pages }}.
+                        </span>
+                    
+                        {% if paginated_products.has_previous %}
+                            <a href="?page={{ products.previous_page_number }}">previous</a>
+                            <a href="?page=1">first</a>
+                        {% endif %}
+                    </span>
                 </div>
             </div>
             
