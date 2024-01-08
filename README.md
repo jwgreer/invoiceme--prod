@@ -1,5 +1,8 @@
 # Invoiceme / Case Tracker
 
+These two projects were desinged and built by Jordan Greer. The basis for these projects are to provide small business' with the ability
+to generate invoices, and track work cases.
+
 # Invoiceme
 
 ## Description:
